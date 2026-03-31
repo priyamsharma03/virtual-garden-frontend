@@ -2,16 +2,70 @@
   @if (plant(); as activePlant) {
     <button class="back-btn" type="button" routerLink="/plants">← Back to Plants</button>
 
-    <article class="detail-layout">
-      <img [src]="activePlant.imageUrl" [alt]="activePlant.commonName" />
+    <article class="detail-layout glass-panel">
+      <div class="media-column">
+        <img [src]="selectedImage()" [alt]="activePlant.commonName" />
 
-      <div class="content">
-        <span class="category">{{ activePlant.category }}</span>
+        <div class="gallery-row">
+          @for (image of galleryImages(); track image; let i = $index) {
+            <button
+              type="button"
+              class="thumb"
+              [class.active]="selectedImage() === image"
+              (click)="selectImage(i)"
+              [attr.aria-label]="'View photo ' + (i + 1)"
+            >
+              <img [src]="image" [alt]="activePlant.commonName + ' photo ' + (i + 1)" loading="lazy" />
+            </button>
+          }
+        </div>
+
+        <div class="micro-meta">
+          <span>Category: {{ activePlant.category }}</span>
+          <span>{{ activePlant.foundIn.length }} major regions</span>
+          <span>{{ galleryImages().length }} photos</span>
+        </div>
+      </div>
+
+      <div class="content-column">
+        <p class="tagline">Botanical Product Profile</p>
         <h1>{{ activePlant.commonName }}</h1>
         <p class="scientific">{{ activePlant.scientificName }}</p>
 
+        <div class="quick-row">
+          <article>
+            <span class="label">Availability</span>
+            <strong>Seasonal Natural Extract</strong>
+          </article>
+          <article>
+            <span class="label">Traditional Trust</span>
+            <strong>★★★★★ 4.8/5</strong>
+          </article>
+        </div>
+
+        <section class="info-block benefits">
+          <h2>Key Benefits</h2>
+          <div class="chip-row">
+            @for (use of activePlant.medicinalUses; track use) {
+              <span>{{ use }}</span>
+            }
+          </div>
+        </section>
+
+        <section class="info-block usage-details">
+          <h2>Medicinal Use Details</h2>
+          <div class="use-detail-grid">
+            @for (useDetail of medicinalUseDetails(); track useDetail.title) {
+              <article>
+                <h3>{{ useDetail.title }}</h3>
+                <p>{{ useDetail.detail }}</p>
+              </article>
+            }
+          </div>
+        </section>
+
         <section class="info-block">
-          <h2>🧭 Found In (Regions)</h2>
+          <h2>Found In (Regions)</h2>
           <ul>
             @for (region of activePlant.foundIn; track region) {
               <li>{{ region }}</li>
@@ -20,20 +74,41 @@
         </section>
 
         <section class="info-block">
-          <h2>💊 Medicinal Uses</h2>
-          <ul>
-            @for (use of activePlant.medicinalUses; track use) {
-              <li>{{ use }}</li>
-            }
-          </ul>
-        </section>
-
-        <section class="info-block">
-          <h2>📘 Description</h2>
+          <h2>Description</h2>
           <p>{{ activePlant.description }}</p>
         </section>
+
+        <div class="action-row">
+          <button type="button">Save to Herbal List</button>
+          <a routerLink="/garden-3d">View in 3D Garden</a>
+        </div>
       </div>
     </article>
+
+    <section class="suggestions">
+      <div class="suggestions-head">
+        <h2>You May Also Like</h2>
+        <div class="carousel-controls">
+          <button type="button" (click)="previousSuggestions()" [disabled]="!canSlidePrevious()">←</button>
+          <button type="button" (click)="nextSuggestions()" [disabled]="!canSlideNext()">→</button>
+        </div>
+      </div>
+
+      <div class="suggestion-grid">
+        @for (suggestion of suggestionWindow(); track suggestion.id) {
+          <article class="suggestion-card">
+            <img [src]="suggestion.imageUrl" [alt]="suggestion.commonName" loading="lazy" />
+            <div>
+              <p class="category">{{ suggestion.category }}</p>
+              <h3>{{ suggestion.commonName }}</h3>
+              <p class="small-sci">{{ suggestion.scientificName }}</p>
+              <p>{{ suggestion.shortDescription }}</p>
+              <a [routerLink]="['/plants', suggestion.id]">Open Details</a>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
   } @else {
     <article class="not-found glass-panel">
       <h1>Plant not found</h1>

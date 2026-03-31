@@ -64,5 +64,49 @@
     "description": "Ginger rhizome is traditionally used to ease nausea, support digestion, and provide warming relief in cold seasons. It is consumed fresh, dried, or as tea.",
     "foundIn": ["South Asia", "Southeast Asia", "West Africa", "Caribbean"],
     "medicinalUses": ["Digestive comfort", "Nausea relief", "Supports circulation", "Immune support"]
+  },
+  {
+    "id": "brahmi",
+    "commonName": "Brahmi",
+    "scientificName": "Bacopa monnieri",
+    "category": "Ayurvedic",
+    "imageUrl": "https://images.unsplash.com/photo-1514996937319-344454492b37?auto=format&fit=crop&w=1200&q=80",
+    "shortDescription": "Creeping herb valued for memory and cognitive wellness.",
+    "description": "Brahmi is widely used in Ayurveda as a nootropic herb. It is associated with mental clarity, concentration, and support for nervous system balance.",
+    "foundIn": ["India", "Sri Lanka", "Vietnam", "Wet tropical regions"],
+    "medicinalUses": ["Supports memory", "Focus support", "Calming effect", "Nervous system support"]
+  },
+  {
+    "id": "amla",
+    "commonName": "Amla",
+    "scientificName": "Phyllanthus emblica",
+    "category": "Trees",
+    "imageUrl": "https://images.unsplash.com/photo-1613743983303-b3e89f8a2b80?auto=format&fit=crop&w=1200&q=80",
+    "shortDescription": "Nutrient-rich Indian gooseberry used for rejuvenation.",
+    "description": "Amla fruit is rich in vitamin C and antioxidants. It is commonly used in herbal formulations for immunity, hair health, and digestive care.",
+    "foundIn": ["India", "Nepal", "Pakistan", "Bangladesh"],
+    "medicinalUses": ["Immune support", "Antioxidant support", "Hair and skin support", "Digestive wellness"]
+  },
+  {
+    "id": "lemongrass",
+    "commonName": "Lemongrass",
+    "scientificName": "Cymbopogon citratus",
+    "category": "Herbs",
+    "imageUrl": "https://images.unsplash.com/photo-1625944230945-1b7dd3b949ab?auto=format&fit=crop&w=1200&q=80",
+    "shortDescription": "Aromatic herb used for tea, digestion, and relaxation.",
+    "description": "Lemongrass is prized for its citrus aroma and soothing herbal infusions. It is traditionally used for digestion, mild detox support, and calming wellness routines.",
+    "foundIn": ["India", "Thailand", "Sri Lanka", "Tropical Americas"],
+    "medicinalUses": ["Digestive comfort", "Relaxation support", "Mild antimicrobial support", "Detox traditions"]
+  },
+  {
+    "id": "moringa",
+    "commonName": "Moringa",
+    "scientificName": "Moringa oleifera",
+    "category": "Trees",
+    "imageUrl": "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=1200&q=80",
+    "shortDescription": "Nutrient-dense tree known as the miracle tree.",
+    "description": "Moringa leaves and pods are consumed for nutrient density and antioxidant value. Traditional practices use it for energy support and balanced nutrition.",
+    "foundIn": ["India", "Sub-Saharan Africa", "Philippines", "Central America"],
+    "medicinalUses": ["Nutritional support", "Energy support", "Antioxidant support", "General wellness"]
   }
 ]

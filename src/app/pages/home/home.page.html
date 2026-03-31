@@ -36,3 +36,58 @@
     }
   </div>
 </section>
+
+<section class="impact page-container" @fadeInUp>
+  <div class="section-head">
+    <h2>Garden Impact at a Glance</h2>
+  </div>
+
+  <div class="stats-grid">
+    @for (item of impactStats; track item.label) {
+      <article class="stat-card glass-panel">
+        <strong>{{ item.value }}</strong>
+        <p>{{ item.label }}</p>
+      </article>
+    }
+  </div>
+</section>
+
+<section class="journey page-container" @fadeInUp>
+  <div class="section-head">
+    <h2>Your Learning Pathway</h2>
+  </div>
+
+  <div class="path-grid">
+    @for (path of pathways; track path.title) {
+      <article class="path-card">
+        <span class="step">{{ $index + 1 }}</span>
+        <h3>{{ path.title }}</h3>
+        <p>{{ path.text }}</p>
+      </article>
+    }
+  </div>
+</section>
+
+<section class="deep-dive page-container" @fadeInUp>
+  <article class="deep-panel glass-panel">
+    <div>
+      <p class="eyebrow">Built for Serious Botanical Exploration</p>
+      <h2>From Ancient Knowledge to Interactive Digital Experiences</h2>
+      <p>
+        Virtual Medicinal Garden combines tradition and technology to create a guided, engaging, and evidence-aware
+        plant learning ecosystem.
+      </p>
+
+      <ul>
+        @for (point of highlights; track point) {
+          <li>{{ point }}</li>
+        }
+      </ul>
+    </div>
+
+    <div class="action-panel">
+      <a class="btn btn-primary" routerLink="/plants">Start with Plant Catalog</a>
+      <a class="btn btn-secondary" routerLink="/garden-3d">Enter Immersive 3D Garden</a>
+    </div>
+  </article>
+</section>
