@@ -1,0 +1,43 @@
+.garden-page {
+  position: relative;
+  min-height: calc(100vh - 4.5rem);
+
+  canvas {
+    width: 100%;
+    height: calc(100vh - 4.5rem);
+    display: block;
+  }
+}
+
+.overlay {
+  position: absolute;
+  top: 1.2rem;
+  left: 1.2rem;
+  max-width: min(460px, 92%);
+  padding: 1rem;
+
+  h1 {
+    margin: 0;
+    font-size: clamp(1.4rem, 3.5vw, 2rem);
+  }
+
+  p {
+    color: var(--text-secondary);
+    margin: 0.6rem 0;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 640px) {
+  .overlay {
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0.8rem;
+  }
+}

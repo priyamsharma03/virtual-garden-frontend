@@ -1,0 +1,80 @@
+.plant-card {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  transition: transform 240ms ease, box-shadow 240ms ease;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-hover);
+  }
+}
+
+.image-wrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.category {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 85%, #000000 15%);
+}
+
+.content {
+  padding: 1rem;
+}
+
+h3 {
+  margin: 0;
+  font-family: var(--heading-font);
+}
+
+.scientific {
+  margin: 0.25rem 0 0;
+  color: var(--accent);
+  font-size: 0.92rem;
+  font-style: italic;
+}
+
+.description {
+  margin: 0.7rem 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.uses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.use-pill {
+  font-size: 0.73rem;
+  background: color-mix(in srgb, var(--secondary) 26%, transparent);
+  color: color-mix(in srgb, var(--primary) 80%, var(--text-primary) 20%);
+  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+}
+
+.view-link {
+  display: inline-block;
+  margin-top: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+}

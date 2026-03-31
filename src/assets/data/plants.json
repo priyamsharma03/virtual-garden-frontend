@@ -1,0 +1,68 @@
+[
+  {
+    "id": "tulsi",
+    "commonName": "Tulsi",
+    "scientificName": "Ocimum sanctum",
+    "category": "Ayurvedic",
+    "imageUrl": "https://images.unsplash.com/photo-1615485925873-212dc0c9746d?auto=format&fit=crop&w=1200&q=80",
+    "shortDescription": "Sacred basil known for immunity and respiratory support.",
+    "description": "Tulsi is widely revered in traditional medicine for adaptogenic and anti-inflammatory properties. It is commonly consumed as tea or leaf extract for respiratory wellness.",
+    "foundIn": ["India", "Nepal", "Sri Lanka", "Southeast Asia"],
+    "medicinalUses": ["Boosts immunity", "Supports respiratory health", "Reduces stress", "Antioxidant support"]
+  },
+  {
+    "id": "neem",
+    "commonName": "Neem",
+    "scientificName": "Azadirachta indica",
+    "category": "Trees",
+    "imageUrl": "https://images.unsplash.com/photo-1605123747553-96b7f5f8e4a2?auto=format&fit=crop&w=1200&q=80",
+    "shortDescription": "A medicinal tree valued for antibacterial and skin benefits.",
+    "description": "Neem leaves, bark, and seed oil have long been used in natural remedies. Its antimicrobial qualities make it popular for oral care, skin support, and traditional detox practices.",
+    "foundIn": ["Indian Subcontinent", "Myanmar", "Tropical Africa"],
+    "medicinalUses": ["Skin care", "Oral hygiene", "Natural antimicrobial", "Supports blood purification traditions"]
+  },
+  {
+    "id": "aloe-vera",
+    "commonName": "Aloe Vera",
+    "scientificName": "Aloe barbadensis",
+    "category": "Herbs",
+    "imageUrl": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=1200&q=80",
+    "shortDescription": "Succulent herb known for soothing skin and digestion support.",
+    "description": "Aloe vera gel is widely used for cooling and moisturizing skin, especially for mild irritation. The inner pulp is also used in wellness traditions for digestive comfort.",
+    "foundIn": ["North Africa", "Arabian Peninsula", "India", "Mexico"],
+    "medicinalUses": ["Soothes skin", "Supports wound care", "Hydration", "Digestive support"]
+  },
+  {
+    "id": "ashwagandha",
+    "commonName": "Ashwagandha",
+    "scientificName": "Withania somnifera",
+    "category": "Ayurvedic",
+    "imageUrl": "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&w=1200&q=80",
+    "shortDescription": "Adaptogenic herb used for energy, stress, and vitality.",
+    "description": "Ashwagandha root is a cornerstone herb in Ayurvedic practice. It is commonly associated with resilience, stress management, and support for mental and physical stamina.",
+    "foundIn": ["India", "Middle East", "North Africa"],
+    "medicinalUses": ["Stress support", "Improves stamina", "Supports sleep quality", "General vitality"]
+  },
+  {
+    "id": "turmeric",
+    "commonName": "Turmeric",
+    "scientificName": "Curcuma longa",
+    "category": "Herbs",
+    "imageUrl": "https://images.unsplash.com/photo-1615485291234-9fbc63217b02?auto=format&fit=crop&w=1200&q=80",
+    "shortDescription": "Golden rhizome celebrated for anti-inflammatory compounds.",
+    "description": "Turmeric contains curcumin, a bioactive compound studied for anti-inflammatory and antioxidant effects. It is widely used in food and wellness formulations.",
+    "foundIn": ["India", "Bangladesh", "Indonesia", "China"],
+    "medicinalUses": ["Joint support", "Anti-inflammatory support", "Digestive support", "Antioxidant support"]
+  },
+  {
+    "id": "ginger",
+    "commonName": "Ginger",
+    "scientificName": "Zingiber officinale",
+    "category": "Herbs",
+    "imageUrl": "https://images.unsplash.com/photo-1599909533898-ec6f18d56054?auto=format&fit=crop&w=1200&q=80",
+    "shortDescription": "Warming root used for digestion and seasonal wellness.",
+    "description": "Ginger rhizome is traditionally used to ease nausea, support digestion, and provide warming relief in cold seasons. It is consumed fresh, dried, or as tea.",
+    "foundIn": ["South Asia", "Southeast Asia", "West Africa", "Caribbean"],
+    "medicinalUses": ["Digestive comfort", "Nausea relief", "Supports circulation", "Immune support"]
+  }
+]

@@ -1,0 +1,29 @@
+<header class="navbar-wrap">
+  <nav class="navbar page-container">
+    <a class="brand" routerLink="/" (click)="closeMenu()">
+      <span class="icon" aria-hidden="true">🌿</span>
+      <span>Virtual Garden</span>
+    </a>
+
+    <button class="menu-btn" type="button" (click)="toggleMenu()" aria-label="Toggle navigation menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="nav-right" [class.open]="menuOpen()">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Home</a>
+      <a routerLink="/plants" routerLinkActive="active" (click)="closeMenu()">Plants</a>
+      <a routerLink="/garden-3d" routerLinkActive="active" (click)="closeMenu()">3D Garden</a>
+      <a routerLink="/about" routerLinkActive="active" (click)="closeMenu()">About</a>
+
+      <button class="theme-toggle" type="button" (click)="toggleTheme()">
+        @if (themeService.isDark()) {
+          ☀ Light
+        } @else {
+          🌙 Dark
+        }
+      </button>
+    </div>
+  </nav>
+</header>

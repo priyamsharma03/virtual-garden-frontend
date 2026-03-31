@@ -1,0 +1,38 @@
+<section class="hero" @fadeInUp>
+  <div class="page-container hero-grid">
+    <article class="hero-copy">
+      <p class="eyebrow">Digital Ayurveda and Botanical Learning</p>
+      <h1>Virtual Medicinal Garden</h1>
+      <p class="subtitle">Explore the healing power of nature</p>
+      <p class="description">
+        Discover medicinal plants through science-backed information, immersive visuals, and a responsive
+        learning experience crafted for curious minds.
+      </p>
+
+      <div class="cta-row">
+        <a class="btn btn-primary" routerLink="/plants">Explore Plants</a>
+        <a class="btn btn-secondary" routerLink="/garden-3d">View 3D Garden</a>
+      </div>
+
+      <button class="scroll-hint" type="button" (click)="scrollToFeatured()">Scroll to featured plants ↓</button>
+    </article>
+
+    <article class="hero-preview glass-panel" @fadeInUp>
+      <h2>Live Garden Preview</h2>
+      <canvas #previewCanvas aria-label="Small animated medicinal garden preview"></canvas>
+    </article>
+  </div>
+</section>
+
+<section id="featured-plants" class="featured page-container" @fadeInUp>
+  <div class="section-head">
+    <h2>Featured Medicinal Plants</h2>
+    <a routerLink="/plants">See full collection</a>
+  </div>
+
+  <div class="plants-grid">
+    @for (plant of featuredPlants(); track plant.id) {
+      <app-plant-card [plant]="plant"></app-plant-card>
+    }
+  </div>
+</section>

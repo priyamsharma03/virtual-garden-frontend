@@ -1,0 +1,44 @@
+<section class="page-container detail-page" @fadeInUp>
+  @if (plant(); as activePlant) {
+    <button class="back-btn" type="button" routerLink="/plants">← Back to Plants</button>
+
+    <article class="detail-layout">
+      <img [src]="activePlant.imageUrl" [alt]="activePlant.commonName" />
+
+      <div class="content">
+        <span class="category">{{ activePlant.category }}</span>
+        <h1>{{ activePlant.commonName }}</h1>
+        <p class="scientific">{{ activePlant.scientificName }}</p>
+
+        <section class="info-block">
+          <h2>🧭 Found In (Regions)</h2>
+          <ul>
+            @for (region of activePlant.foundIn; track region) {
+              <li>{{ region }}</li>
+            }
+          </ul>
+        </section>
+
+        <section class="info-block">
+          <h2>💊 Medicinal Uses</h2>
+          <ul>
+            @for (use of activePlant.medicinalUses; track use) {
+              <li>{{ use }}</li>
+            }
+          </ul>
+        </section>
+
+        <section class="info-block">
+          <h2>📘 Description</h2>
+          <p>{{ activePlant.description }}</p>
+        </section>
+      </div>
+    </article>
+  } @else {
+    <article class="not-found glass-panel">
+      <h1>Plant not found</h1>
+      <p>This plant could not be loaded. Please go back and try another plant.</p>
+      <a routerLink="/plants">Return to Plants</a>
+    </article>
+  }
+</section>

@@ -1,0 +1,28 @@
+.scroll-top {
+  position: fixed;
+  right: 1.2rem;
+  bottom: 1.4rem;
+  z-index: 180;
+  width: 2.8rem;
+  height: 2.8rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 1.2rem;
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+  animation: rise 240ms ease;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

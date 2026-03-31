@@ -1,0 +1,38 @@
+<section class="page-container plants-page" @fadeInUp>
+  <div class="head-row">
+    <div>
+      <h1>Medicinal Plants</h1>
+      <p>Search by name and filter by category to discover healing plants.</p>
+    </div>
+    <span class="count-chip">{{ filteredPlants().length }} plants</span>
+  </div>
+
+  <div class="filters glass-panel">
+    <label>
+      Search
+      <input
+        type="search"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        placeholder="Search Tulsi, Neem, Aloe Vera..."
+      />
+    </label>
+
+    <label>
+      Category
+      <select [ngModel]="selectedCategory()" (ngModelChange)="selectedCategory.set($event)">
+        @for (category of categories(); track category) {
+          <option [value]="category">{{ category }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  <div class="grid">
+    @for (plant of filteredPlants(); track plant.id) {
+      <app-plant-card [plant]="plant"></app-plant-card>
+    } @empty {
+      <p class="empty">No plants match your search.</p>
+    }
+  </div>
+</section>
