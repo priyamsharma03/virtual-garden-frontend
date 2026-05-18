@@ -1,0 +1,55 @@
+DATABASE SCHEMA FOR VIRTUAL GARDEN
+
+--- 1. ROLES ---
+Table: roles
+Description: Stores the user roles (Admin, Manager). Keeps it simple as this is static data.
+- id (Integer, Primary Key, Auto-increment)
+- name (Enum: 'Admin', 'Manager')
+
+--- 2. USERS ---
+Table: users
+Description: Stores users who can edit things or control the website.
+- id (UUID, Primary Key)
+- name (String)
+- email (String, Unique)
+- password_hash (String)
+- role_id (Integer, Foreign Key to roles.id)
+- created_at (Timestamp)
+- updated_at (Timestamp)
+- deleted_at (Timestamp, nullable - for soft delete)
+- created_by (UUID, Foreign Key to users)
+- deleted_by (UUID, Foreign Key to users)
+
+--- 3. CATEGORIES (Master Table) ---
+Table: categories
+Description: Stores plant classification (e.g., Herbs, Trees). Keeping it simple as this is mostly static data.
+- id (Integer, Primary Key, Auto-increment)
+- name (String)
+- description (Text, nullable)
+
+--- 4. AYUSH SYSTEMS (Master Table) ---
+Table: ayush_systems
+Description: Stores traditional medicinal systems (Ayurveda, Unani). Keeping it simple as this is static data.
+- id (Integer, Primary Key, Auto-increment)
+- name (String)
+- description (Text, nullable)
+
+--- 5. PLANTS (Core Data Table) ---
+Table: plants
+Description: Stores main information about the medicinal plants.
+- id (UUID, Primary Key)
+- botanical_name / scientific_name (String, Unique)
+- common_name (String)
+- short_description (String)
+- description (Text)
+- medicinal_uses (JSON or Text - derived from your frontend's 'medicinalUses' array)
+- found_in (JSON or Text - derived from your frontend's 'foundIn' array)
+- image_url (String - path mapped to Cloudinary)
+- model_url (String, nullable - for the 3D models later)
+- category_id (Integer, Foreign Key to categories.id)
+- ayush_id (Integer, Foreign Key to ayush_systems.id)
+- created_at (Timestamp)
+- updated_at (Timestamp)
+- deleted_at (Timestamp, nullable - for soft delete)
+- created_by (UUID, Foreign Key to users)
+- deleted_by (UUID, Foreign Key to users)

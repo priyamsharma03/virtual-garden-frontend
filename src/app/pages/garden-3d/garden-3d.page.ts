@@ -44,7 +44,10 @@ export class Garden3dPageComponent implements AfterViewInit, OnDestroy {
 
   private sceneHandle?: SceneHandle;
 
-  constructor() {
+  constructor(
+
+    
+  ) {
     this.updateMobileView();
 
     effect(() => {

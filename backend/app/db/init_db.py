@@ -1,0 +1,33 @@
+import uuid
+
+from sqlalchemy.orm import Session
+
+from app.core.config import settings
+from app.core.security import get_password_hash
+from app.models.role import Role
+from app.models.user import User
+
+
+def init_db(db: Session) -> None:
+    roles = {role.name: role for role in db.query(Role).all()}
+    if "Admin" not in roles:
+        admin_role = Role(name="Admin")
+        db.add(admin_role)
+        db.flush()
+        roles["Admin"] = admin_role
+
+    if "Manager" not in roles:
+        db.add(Role(name="Manager"))
+
+    existing_admin = db.query(User).filter(User.email == settings.ADMIN_EMAIL).first()
+    if not existing_admin:
+        admin = User(
+            id=str(uuid.uuid4()),
+            name=settings.ADMIN_NAME,
+            email=settings.ADMIN_EMAIL,
+            password_hash=get_password_hash(settings.ADMIN_PASSWORD),
+            role_id=roles["Admin"].id,
+        )
+        db.add(admin)
+
+    db.commit()
