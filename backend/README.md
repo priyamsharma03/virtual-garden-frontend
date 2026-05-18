@@ -1,4 +1,4 @@
-# Virtual Garden Backend (FastAPI + MySQL)
+# Virtual Garden Backend (FastAPI)
 
 A clean FastAPI backend aligned with the Angular frontend models.
 
@@ -11,18 +11,18 @@ A clean FastAPI backend aligned with the Angular frontend models.
 1) Create and activate a virtual environment
 2) Install dependencies:
    pip install -r requirements.txt
-3) Configure environment:
+3) Configure environment if you want MySQL:
    cp .env.example .env
-4) Run migrations:
-   alembic revision --autogenerate -m "init"
-   alembic upgrade head
-5) Seed base data:
+   By default the API runs with SQLite at ./virtual_garden.db for local development.
+4) Initialize and seed data:
    python scripts/init_db.py
    python scripts/seed_plants.py
-6) Start API:
+5) Start API:
    uvicorn app.main:app --reload --port 8000
 
 ## Notes
 - Default API base path: /api/v1
 - CORS is set via CORS_ORIGINS in .env
 - Admin user is created from ADMIN_* env values
+- Admins can manage users, roles, plants, categories, and AYUSH systems.
+- Managers can create, edit, and soft-delete plant records.

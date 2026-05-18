@@ -5,7 +5,9 @@ class PlantBase(BaseModel):
     common_name: str = Field(..., alias="commonName")
     scientific_name: str = Field(..., alias="scientificName")
     category: str
+    ayush_system: str | None = Field(None, alias="ayushSystem")
     image_url: str = Field(..., alias="imageUrl")
+    model_url: str | None = Field(None, alias="modelUrl")
     short_description: str = Field(..., alias="shortDescription")
     description: str
     found_in: list[str] = Field(default_factory=list, alias="foundIn")
@@ -22,7 +24,9 @@ class PlantUpdate(BaseModel):
     common_name: str | None = Field(None, alias="commonName")
     scientific_name: str | None = Field(None, alias="scientificName")
     category: str | None = None
+    ayush_system: str | None = Field(None, alias="ayushSystem")
     image_url: str | None = Field(None, alias="imageUrl")
+    model_url: str | None = Field(None, alias="modelUrl")
     short_description: str | None = Field(None, alias="shortDescription")
     description: str | None = None
     found_in: list[str] | None = Field(None, alias="foundIn")

@@ -33,7 +33,21 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
     return user
 
 
-def require_admin(user: User = Depends(get_current_user)) -> User:
-    if not user.role or user.role.name != "Admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin role required")
-    return user
+def require_roles(*role_names: str):
+    allowed = {role_name.lower() for role_name in role_names}
+
+    def dependency(user: User = Depends(get_current_user)) -> User:
+        role_name = user.role.name.lower() if user.role else ""
+        if role_name not in allowed:
+            readable_roles = ", ".join(role_names)
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Required role: {readable_roles}",
+            )
+        return user
+
+    return dependency
+
+
+require_admin = require_roles("Admin")
+require_content_manager = require_roles("Admin", "Manager")

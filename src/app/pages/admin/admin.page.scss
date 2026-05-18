@@ -1,0 +1,305 @@
+.admin-page {
+  padding: 1.8rem 0 2.6rem;
+}
+
+.workspace-head,
+.panel-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h1,
+  h2,
+  p {
+    margin: 0;
+  }
+
+  p {
+    margin-top: 0.35rem;
+    color: var(--text-secondary);
+  }
+}
+
+.eyebrow {
+  margin: 0 0 0.55rem;
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.session-card,
+.login-panel,
+.notice-panel,
+.editor-panel,
+.catalog-panel,
+.team-panel {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: var(--shadow-soft);
+}
+
+.session-card {
+  min-width: 220px;
+  padding: 0.85rem;
+  display: grid;
+  gap: 0.35rem;
+
+  span {
+    width: max-content;
+    padding: 0.22rem 0.5rem;
+    border-radius: 999px;
+    color: #ffffff;
+    background: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.login-panel,
+.notice-panel {
+  width: min(460px, 100%);
+  margin: 1.4rem auto 0;
+  padding: 1.2rem;
+  display: grid;
+  gap: 0.85rem;
+
+  h2,
+  p {
+    margin: 0;
+  }
+}
+
+.hint {
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+}
+
+label {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  padding: 0.62rem 0.72rem;
+  background: var(--surface);
+  color: var(--text-primary);
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid color-mix(in srgb, var(--primary) 28%, transparent);
+  border-color: var(--primary);
+}
+
+.login-panel button,
+.primary-action,
+.team-form button {
+  padding: 0.72rem 1rem;
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.session-card button,
+.ghost-btn,
+.plant-list button,
+.user-table button {
+  padding: 0.5rem 0.72rem;
+  color: var(--text-primary);
+  background: var(--surface);
+  border-color: var(--border-color);
+}
+
+.toast {
+  margin: 1rem 0 0;
+  border-radius: 0.5rem;
+  padding: 0.7rem 0.85rem;
+  font-weight: 700;
+}
+
+.toast.success {
+  background: color-mix(in srgb, var(--secondary) 20%, transparent);
+  color: var(--primary);
+}
+
+.toast.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.admin-grid {
+  margin-top: 1.1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.75fr);
+  gap: 1rem;
+}
+
+.editor-panel,
+.catalog-panel,
+.team-panel {
+  padding: 1rem;
+}
+
+.form-grid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.form-grid label:nth-child(8) {
+  grid-column: 1 / -1;
+}
+
+.editor-panel > label,
+.split-fields,
+.primary-action {
+  margin-top: 0.85rem;
+}
+
+.split-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.plant-list {
+  margin-top: 0.9rem;
+  max-height: 780px;
+  overflow: auto;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.plant-list article,
+.user-table article {
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  padding: 0.55rem;
+  display: grid;
+  gap: 0.55rem;
+  background: var(--surface);
+}
+
+.plant-list article {
+  grid-template-columns: 58px 1fr auto auto;
+  align-items: center;
+}
+
+.plant-list article.selected {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--secondary) 12%, var(--surface));
+}
+
+.plant-list img {
+  width: 58px;
+  height: 58px;
+  border-radius: 0.45rem;
+  object-fit: cover;
+}
+
+.plant-list strong,
+.plant-list span,
+.plant-list small,
+.user-table strong,
+.user-table span {
+  display: block;
+}
+
+.plant-list span,
+.user-table span {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.plant-list small,
+.user-table small {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.danger-btn,
+.user-table button {
+  color: #991b1b;
+}
+
+.team-panel {
+  margin-top: 1rem;
+}
+
+.team-form {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.user-table {
+  margin-top: 0.8rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.user-table article {
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+}
+
+@media (max-width: 1040px) {
+  .admin-grid,
+  .team-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .workspace-head,
+  .panel-head,
+  .split-fields {
+    grid-template-columns: 1fr;
+    display: grid;
+    align-items: start;
+  }
+
+  .form-grid,
+  .plant-list article,
+  .user-table article {
+    grid-template-columns: 1fr;
+  }
+
+  .plant-list img {
+    width: 100%;
+    height: 150px;
+  }
+}

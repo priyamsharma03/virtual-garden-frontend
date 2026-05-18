@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import auth, plants, categories, ayush_systems, health
+from app.api.routers import auth, plants, categories, ayush_systems, health, users
 from app.core.config import settings
 
 app = FastAPI(title=settings.APP_NAME)
@@ -16,6 +16,7 @@ app.add_middleware(
 
 app.include_router(health.router, prefix=settings.API_PREFIX)
 app.include_router(auth.router, prefix=settings.API_PREFIX)
+app.include_router(users.router, prefix=settings.API_PREFIX)
 app.include_router(plants.router, prefix=settings.API_PREFIX)
 app.include_router(categories.router, prefix=settings.API_PREFIX)
 app.include_router(ayush_systems.router, prefix=settings.API_PREFIX)

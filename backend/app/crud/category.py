@@ -29,3 +29,17 @@ def get_or_create(db: Session, name: str) -> Category:
     db.commit()
     db.refresh(category)
     return category
+
+
+def update_category(db: Session, category: Category, payload: CategoryCreate) -> Category:
+    category.name = payload.name
+    category.description = payload.description
+    db.add(category)
+    db.commit()
+    db.refresh(category)
+    return category
+
+
+def delete_category(db: Session, category: Category) -> None:
+    db.delete(category)
+    db.commit()

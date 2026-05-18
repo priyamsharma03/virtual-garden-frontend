@@ -4,11 +4,16 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.security import get_password_hash
+from app.db.base import Base
+from app.db.session import engine
+from app import models  # noqa: F401
 from app.models.role import Role
 from app.models.user import User
 
 
 def init_db(db: Session) -> None:
+    Base.metadata.create_all(bind=engine)
+
     roles = {role.name: role for role in db.query(Role).all()}
     if "Admin" not in roles:
         admin_role = Role(name="Admin")
@@ -17,7 +22,10 @@ def init_db(db: Session) -> None:
         roles["Admin"] = admin_role
 
     if "Manager" not in roles:
-        db.add(Role(name="Manager"))
+        manager_role = Role(name="Manager")
+        db.add(manager_role)
+        db.flush()
+        roles["Manager"] = manager_role
 
     existing_admin = db.query(User).filter(User.email == settings.ADMIN_EMAIL).first()
     if not existing_admin:

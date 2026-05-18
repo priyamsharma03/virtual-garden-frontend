@@ -18,3 +18,28 @@ def create_ayush_system(db: Session, payload: AyushSystemCreate) -> AyushSystem:
     db.commit()
     db.refresh(system)
     return system
+
+
+def get_or_create(db: Session, name: str) -> AyushSystem:
+    system = get_ayush_system_by_name(db, name)
+    if system:
+        return system
+    system = AyushSystem(name=name)
+    db.add(system)
+    db.commit()
+    db.refresh(system)
+    return system
+
+
+def update_ayush_system(db: Session, system: AyushSystem, payload: AyushSystemCreate) -> AyushSystem:
+    system.name = payload.name
+    system.description = payload.description
+    db.add(system)
+    db.commit()
+    db.refresh(system)
+    return system
+
+
+def delete_ayush_system(db: Session, system: AyushSystem) -> None:
+    db.delete(system)
+    db.commit()

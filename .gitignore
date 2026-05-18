@@ -30,6 +30,9 @@ yarn-error.log
 
 # Miscellaneous
 /.angular/cache
+.venv/
+__pycache__/
+*.db
 .sass-cache/
 /connect.lock
 /coverage

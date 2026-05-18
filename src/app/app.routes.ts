@@ -18,6 +18,10 @@ export const routes: Routes = [
 		loadChildren: () => import('./pages/about/about.routes').then((m) => m.ABOUT_ROUTES)
 	},
 	{
+		path: 'admin',
+		loadComponent: () => import('./pages/admin/admin.page').then((m) => m.AdminPageComponent)
+	},
+	{
 		path: '**',
 		redirectTo: ''
 	}

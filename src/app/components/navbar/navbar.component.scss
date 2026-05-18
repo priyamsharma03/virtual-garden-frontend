@@ -18,7 +18,7 @@
 
 .brand {
   font-family: var(--heading-font);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.1rem;
   display: inline-flex;
   align-items: center;
@@ -27,7 +27,15 @@
 }
 
 .icon {
-  font-size: 1.4rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  display: inline-grid;
+  place-items: center;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.72rem;
+  letter-spacing: 0;
 }
 
 .menu-btn {

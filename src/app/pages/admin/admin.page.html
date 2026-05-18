@@ -1,0 +1,182 @@
+<section class="admin-page page-container" @fadeInUp>
+  <div class="workspace-head">
+    <div>
+      <p class="eyebrow">Role Based Control</p>
+      <h1>Garden Admin Workspace</h1>
+      <p>Manage medicinal plant records, protected by Admin and Manager roles.</p>
+    </div>
+
+    @if (authService.currentUser(); as user) {
+      <div class="session-card">
+        <span>{{ user.role }}</span>
+        <strong>{{ user.name }}</strong>
+        <button type="button" (click)="logout()">Sign out</button>
+      </div>
+    }
+  </div>
+
+  @if (!authService.isAuthenticated()) {
+    <form class="login-panel" [formGroup]="loginForm" (ngSubmit)="login()">
+      <h2>Sign in</h2>
+      <label>
+        Email
+        <input type="email" formControlName="email" autocomplete="username" />
+      </label>
+      <label>
+        Password
+        <input type="password" formControlName="password" autocomplete="current-password" />
+      </label>
+      <button type="submit" [disabled]="busy()">Login</button>
+      <p class="hint">Use the admin credentials from backend environment settings.</p>
+    </form>
+  } @else if (!authService.isContentManager()) {
+    <article class="notice-panel">
+      <h2>Access limited</h2>
+      <p>Your role can view the catalog, but plant editing requires Admin or Manager access.</p>
+    </article>
+  } @else {
+    @if (feedback()) {
+      <p class="toast success">{{ feedback() }}</p>
+    }
+    @if (error()) {
+      <p class="toast error">{{ error() }}</p>
+    }
+
+    <div class="admin-grid">
+      <form class="editor-panel" [formGroup]="plantForm" (ngSubmit)="savePlant()">
+        <div class="panel-head">
+          <div>
+            <h2>{{ selectedPlantId() ? 'Edit Plant' : 'Add Plant' }}</h2>
+            <p>Changes are written to the FastAPI catalog.</p>
+          </div>
+          <button class="ghost-btn" type="button" (click)="startCreate()">New</button>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            Plant ID
+            <input type="text" formControlName="id" placeholder="ashwagandha" />
+          </label>
+          <label>
+            Common name
+            <input type="text" formControlName="commonName" placeholder="Ashwagandha" />
+          </label>
+          <label>
+            Scientific name
+            <input type="text" formControlName="scientificName" placeholder="Withania somnifera" />
+          </label>
+          <label>
+            Category
+            <input type="text" formControlName="category" list="category-options" placeholder="Herbs" />
+            <datalist id="category-options">
+              @for (category of categories(); track category.id) {
+                <option [value]="category.name"></option>
+              }
+            </datalist>
+          </label>
+          <label>
+            AYUSH system
+            <input type="text" formControlName="ayushSystem" list="ayush-options" placeholder="Ayurveda" />
+            <datalist id="ayush-options">
+              @for (system of ayushSystems(); track system.id) {
+                <option [value]="system.name"></option>
+              }
+            </datalist>
+          </label>
+          <label>
+            Image URL
+            <input type="url" formControlName="imageUrl" placeholder="https://..." />
+          </label>
+          <label>
+            3D model URL
+            <input type="url" formControlName="modelUrl" placeholder="Optional" />
+          </label>
+          <label>
+            Short description
+            <textarea rows="3" formControlName="shortDescription"></textarea>
+          </label>
+        </div>
+
+        <label>
+          Full description
+          <textarea rows="5" formControlName="description"></textarea>
+        </label>
+
+        <div class="split-fields">
+          <label>
+            Found in
+            <textarea rows="5" formControlName="foundIn" placeholder="India&#10;Sri Lanka"></textarea>
+          </label>
+          <label>
+            Medicinal uses
+            <textarea rows="5" formControlName="medicinalUses" placeholder="Immunity&#10;Stress support"></textarea>
+          </label>
+        </div>
+
+        <button class="primary-action" type="submit" [disabled]="busy()">
+          {{ busy() ? 'Saving...' : 'Save Plant' }}
+        </button>
+      </form>
+
+      <aside class="catalog-panel">
+        <div class="panel-head">
+          <div>
+            <h2>Catalog</h2>
+            <p>{{ plants().length }} active plant records</p>
+          </div>
+        </div>
+
+        <div class="plant-list">
+          @for (plant of plants(); track plant.id) {
+            <article [class.selected]="selectedPlantId() === plant.id">
+              <img [src]="plant.imageUrl" [alt]="plant.commonName" loading="lazy" />
+              <div>
+                <strong>{{ plant.commonName }}</strong>
+                <span>{{ plant.scientificName }}</span>
+                <small>{{ plant.category }}</small>
+              </div>
+              <button type="button" (click)="startEdit(plant)">Edit</button>
+              <button class="danger-btn" type="button" (click)="deletePlant(plant)">Delete</button>
+            </article>
+          }
+        </div>
+      </aside>
+    </div>
+
+    @if (authService.isAdmin()) {
+      <section class="team-panel">
+        <div class="panel-head">
+          <div>
+            <h2>Team Access</h2>
+            <p>Admins can add Managers for day-to-day plant edits.</p>
+          </div>
+        </div>
+
+        <form class="team-form" [formGroup]="userForm" (ngSubmit)="createUser()">
+          <input type="text" formControlName="name" placeholder="Name" />
+          <input type="email" formControlName="email" placeholder="Email" />
+          <input type="password" formControlName="password" placeholder="Temporary password" />
+          <select formControlName="role">
+            @for (role of roles(); track role.id) {
+              <option [value]="role.name">{{ role.name }}</option>
+            }
+          </select>
+          <button type="submit" [disabled]="adminBusy()">Add</button>
+        </form>
+
+        <div class="user-table">
+          @for (user of users(); track user.id) {
+            <article>
+              <div>
+                <strong>{{ user.name }}</strong>
+                <span>{{ user.email }}</span>
+              </div>
+              <small>{{ user.role }}</small>
+              <button type="button" (click)="deleteUser(user)">Remove</button>
+            </article>
+          }
+        </div>
+      </section>
+    }
+  }
+</section>
