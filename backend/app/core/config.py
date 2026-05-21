@@ -27,6 +27,13 @@ class Settings(BaseSettings):
     CLOUDINARY_API_SECRET: str | None = None
     CLOUDINARY_UPLOAD_FOLDER: str = "virtual-garden/plants"
 
+    @field_validator("DB_URL", mode="before")
+    @classmethod
+    def normalize_db_url(cls, value):
+        if isinstance(value, str) and value.startswith("postgres://"):
+            return value.replace("postgres://", "postgresql://", 1)
+        return value
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def split_origins(cls, value):
