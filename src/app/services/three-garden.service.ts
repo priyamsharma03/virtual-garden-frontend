@@ -477,11 +477,11 @@ export class ThreeGardenService {
         orbitControls?.dispose();
         pointerControls?.disconnect();
 
-        scene.traverse((child) => {
+        scene.traverse((child: THREE.Object3D) => {
           if (child instanceof THREE.Mesh) {
             child.geometry.dispose();
             if (Array.isArray(child.material)) {
-              child.material.forEach((material) => material.dispose());
+              child.material.forEach((material: THREE.Material) => material.dispose());
             } else {
               child.material.dispose();
             }
