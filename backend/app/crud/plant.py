@@ -55,6 +55,14 @@ def get_by_slug(db: Session, slug: str) -> Plant | None:
     return db.query(Plant).filter(Plant.slug == slug, Plant.deleted_at.is_(None)).first()
 
 
+def get_by_botanical_name(db: Session, botanical_name: str) -> Plant | None:
+    return (
+        db.query(Plant)
+        .filter(Plant.botanical_name == botanical_name, Plant.deleted_at.is_(None))
+        .first()
+    )
+
+
 def create_plant(
     db: Session,
     payload: PlantCreate,

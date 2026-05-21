@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, UploadFile, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_content_manager
@@ -104,7 +105,19 @@ def create_plant(
     )
     category_record = category_crud.get_or_create(db, payload.category)
     ayush_record = ayush_crud.get_or_create(db, payload.ayush_system) if payload.ayush_system else None
-    plant = plant_crud.create_plant(db, payload, category_record, ayush_record, current_user.id)
+    existing = plant_crud.get_by_botanical_name(db, payload.scientific_name)
+    try:
+        if existing:
+            update_payload = PlantUpdate.model_validate(payload.model_dump(by_alias=True))
+            plant = plant_crud.update_plant(db, existing, update_payload, category_record, ayush_record)
+        else:
+            plant = plant_crud.create_plant(db, payload, category_record, ayush_record, current_user.id)
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Scientific name already exists",
+        ) from exc
     return plant_to_public(request, plant)
 
 
@@ -161,7 +174,14 @@ def update_plant(
 
     category_record = category_crud.get_or_create(db, category) if category else None
     ayush_record = ayush_crud.get_or_create(db, ayush_system.strip()) if ayush_system and ayush_system.strip() else None
-    plant = plant_crud.update_plant(db, plant, payload, category_record, ayush_record)
+    try:
+        plant = plant_crud.update_plant(db, plant, payload, category_record, ayush_record)
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Scientific name already exists",
+        ) from exc
     return plant_to_public(request, plant)
 
 
