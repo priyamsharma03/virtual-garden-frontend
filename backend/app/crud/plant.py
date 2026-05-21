@@ -81,6 +81,7 @@ def create_plant(
         medicinal_uses=payload.medicinal_uses,
         found_in=payload.found_in,
         image_url=payload.image_url,
+        image_urls=payload.image_urls,
         model_url=payload.model_url,
         category_id=category.id,
         ayush_id=ayush_system.id if ayush_system else None,
@@ -115,6 +116,8 @@ def update_plant(
         plant.found_in = data["found_in"]
     if "image_url" in data:
         plant.image_url = data["image_url"]
+    if "image_urls" in data:
+        plant.image_urls = data["image_urls"]
     if "model_url" in data:
         plant.model_url = data["model_url"]
     if category:

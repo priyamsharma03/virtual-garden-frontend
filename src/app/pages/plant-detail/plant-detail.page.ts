@@ -135,7 +135,20 @@ export class PlantDetailPageComponent {
       return [];
     }
 
-    return this.plantPhotoLibrary[activePlant.id] ?? [activePlant.imageUrl];
+    const dbImages = (activePlant.imageUrls ?? [])
+      .map((image) => image.trim())
+      .filter((image) => image.length > 0);
+    if (dbImages.length) {
+      return dbImages;
+    }
+
+    const baseImage = activePlant.imageUrl?.trim() ? [activePlant.imageUrl] : [];
+    if (baseImage.length) {
+      return baseImage;
+    }
+
+    const libraryImages = this.plantPhotoLibrary[activePlant.id] ?? [];
+    return libraryImages.filter((image) => !!image && image.trim().length > 0);
   });
 
   protected readonly selectedImage = computed(() => {
@@ -167,12 +180,6 @@ export class PlantDetailPageComponent {
     const activePlant = this.plant();
     const embedUrl = this.resolveSketchfabEmbedUrl(activePlant?.modelUrl ?? '');
     return embedUrl ? this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl) : null;
-  });
-
-  protected readonly rawModelUrl = computed(() => this.plant()?.modelUrl ?? '');
-
-  protected readonly resolvedEmbedString = computed(() => {
-    return this.resolveSketchfabEmbedUrl(this.rawModelUrl()) ?? '';
   });
 
   protected readonly resolvePlantImageUrl = resolvePlantImageUrl;
@@ -221,13 +228,6 @@ export class PlantDetailPageComponent {
   previousSuggestions() {
     if (this.canSlidePrevious()) {
       this.suggestionsStart.update((value) => Math.max(0, value - 1));
-    }
-  }
-
-  openEmbedInNewTab() {
-    const url = this.resolvedEmbedString();
-    if (url) {
-      window.open(url, '_blank', 'noopener');
     }
   }
 

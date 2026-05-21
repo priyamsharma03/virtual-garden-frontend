@@ -58,6 +58,10 @@ def normalize_model_url(value: str | None) -> str | None:
 
 
 def plant_to_public(request: Request, plant: Plant) -> PlantPublic:
+    raw_urls = plant.image_urls or []
+    if not raw_urls and plant.image_url:
+        raw_urls = [plant.image_url]
+    resolved_urls = [build_public_image_url(request, url) for url in raw_urls if url]
     return PlantPublic(
         id=plant.slug,
         commonName=plant.common_name,
@@ -65,6 +69,7 @@ def plant_to_public(request: Request, plant: Plant) -> PlantPublic:
         category=plant.category.name if plant.category else "",
         ayushSystem=plant.ayush_system.name if plant.ayush_system else None,
         imageUrl=build_public_image_url(request, plant.image_url),
+        imageUrls=resolved_urls,
         modelUrl=plant.model_url,
         shortDescription=plant.short_description,
         description=plant.description,
@@ -106,15 +111,25 @@ def create_plant(
     found_in: str = Form("", alias="foundIn"),
     medicinal_uses: str = Form("", alias="medicinalUses"),
     model_url: str | None = Form(None, alias="modelUrl"),
+    image_files: list[UploadFile] | None = File(None, alias="imageFiles"),
     image_file: UploadFile | None = File(None, alias="imageFile"),
     image_url: str | None = Form(None, alias="imageUrl"),
     db: Session = Depends(get_db),
     current_user: User = Depends(require_content_manager),
 ):
-    stored_image_url = upload_image(image_file) if image_file and image_file.filename else None
-    resolved_image_url = stored_image_url or (image_url.strip() if image_url else "")
+    stored_image_urls: list[str] = []
+    if image_files:
+        for file in image_files:
+            if file and file.filename:
+                stored_image_urls.append(upload_image(file))
+    if not stored_image_urls and image_file and image_file.filename:
+        stored_image_urls.append(upload_image(image_file))
+
+    resolved_image_url = stored_image_urls[0] if stored_image_urls else (image_url.strip() if image_url else "")
     if not resolved_image_url:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Plant image is required")
+
+    resolved_image_urls = stored_image_urls or ([image_url.strip()] if image_url else [])
 
     payload = PlantCreate.model_validate(
         {
@@ -123,6 +138,7 @@ def create_plant(
             "category": category,
             "ayushSystem": ayush_system.strip() if ayush_system else None,
             "imageUrl": resolved_image_url,
+            "imageUrls": resolved_image_urls,
             "modelUrl": normalize_model_url(model_url),
             "shortDescription": short_description,
             "description": description,
@@ -161,6 +177,7 @@ def update_plant(
     found_in: str | None = Form(None, alias="foundIn"),
     medicinal_uses: str | None = Form(None, alias="medicinalUses"),
     model_url: str | None = Form(None, alias="modelUrl"),
+    image_files: list[UploadFile] | None = File(None, alias="imageFiles"),
     image_file: UploadFile | None = File(None, alias="imageFile"),
     image_url: str | None = Form(None, alias="imageUrl"),
     db: Session = Depends(get_db),
@@ -191,11 +208,20 @@ def update_plant(
     if model_url is not None:
         payload_data["modelUrl"] = normalize_model_url(model_url)
 
-    stored_image_url = upload_image(image_file) if image_file and image_file.filename else None
-    if stored_image_url:
-        payload_data["imageUrl"] = stored_image_url
+    stored_image_urls: list[str] = []
+    if image_files:
+        for file in image_files:
+            if file and file.filename:
+                stored_image_urls.append(upload_image(file))
+    if not stored_image_urls and image_file and image_file.filename:
+        stored_image_urls.append(upload_image(image_file))
+
+    if stored_image_urls:
+        payload_data["imageUrl"] = stored_image_urls[0]
+        payload_data["imageUrls"] = stored_image_urls
     elif image_url is not None and image_url.strip():
         payload_data["imageUrl"] = image_url.strip()
+        payload_data["imageUrls"] = [image_url.strip()]
 
     payload = PlantUpdate.model_validate(payload_data)
 

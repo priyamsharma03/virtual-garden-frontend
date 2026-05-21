@@ -181,13 +181,17 @@
 
 .mobile-controls {
   display: none;
-  position: absolute;
+  position: fixed;
   left: 50%;
-  bottom: 0.8rem;
+  bottom: max(0.8rem, env(safe-area-inset-bottom));
   transform: translateX(-50%);
   z-index: 6;
   width: min(220px, 70%);
   padding: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-soft);
   grid-template-columns: repeat(3, 1fr);
   grid-template-areas:
     '. up .'
@@ -264,6 +268,7 @@
     overflow: auto;
     background: color-mix(in srgb, var(--surface) 92%, transparent);
     backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-soft);
 
     img {
       margin-bottom: 0.55rem;

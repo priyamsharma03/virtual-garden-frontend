@@ -7,6 +7,7 @@ class PlantBase(BaseModel):
     category: str
     ayush_system: str | None = Field(None, alias="ayushSystem")
     image_url: str = Field(..., alias="imageUrl")
+    image_urls: list[str] = Field(default_factory=list, alias="imageUrls")
     model_url: str | None = Field(None, alias="modelUrl")
     short_description: str = Field(..., alias="shortDescription")
     description: str
@@ -26,6 +27,7 @@ class PlantUpdate(BaseModel):
     category: str | None = None
     ayush_system: str | None = Field(None, alias="ayushSystem")
     image_url: str | None = Field(None, alias="imageUrl")
+    image_urls: list[str] | None = Field(None, alias="imageUrls")
     model_url: str | None = Field(None, alias="modelUrl")
     short_description: str | None = Field(None, alias="shortDescription")
     description: str | None = None

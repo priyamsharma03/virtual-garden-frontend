@@ -35,7 +35,7 @@ export class AdminPageComponent implements OnDestroy {
   protected readonly error = signal('');
   protected readonly resolvePlantImageUrl = resolvePlantImageUrl;
   protected readonly imagePreviewUrl = signal(resolvePlantImageUrl(''));
-  protected readonly selectedImageFile = signal<File | null>(null);
+  protected readonly selectedImageFiles = signal<File[]>([]);
   private adminDataLoaded = false;
   private currentImageUrl = '';
   private previewObjectUrl: string | null = null;
@@ -103,7 +103,7 @@ export class AdminPageComponent implements OnDestroy {
 
   startCreate() {
     this.selectedPlantId.set(null);
-    this.selectedImageFile.set(null);
+    this.selectedImageFiles.set([]);
     this.currentImageUrl = '';
     this.plantForm.reset({
       commonName: '',
@@ -123,7 +123,7 @@ export class AdminPageComponent implements OnDestroy {
 
   startEdit(plant: Plant) {
     this.selectedPlantId.set(plant.id);
-    this.selectedImageFile.set(null);
+    this.selectedImageFiles.set([]);
     this.currentImageUrl = plant.imageUrl;
     this.plantForm.setValue({
       commonName: plant.commonName,
@@ -148,7 +148,7 @@ export class AdminPageComponent implements OnDestroy {
       return;
     }
 
-    if (!this.selectedImageFile() && !this.currentImageUrl) {
+    if (!this.selectedImageFiles().length && !this.currentImageUrl) {
       this.error.set('Please upload a plant image.');
       return;
     }
@@ -249,7 +249,7 @@ export class AdminPageComponent implements OnDestroy {
 
   private buildPlantPayload(): FormData {
     const value = this.plantForm.getRawValue();
-    const selectedFile = this.selectedImageFile();
+    const selectedFiles = this.selectedImageFiles();
 
     const payload = new FormData();
     payload.append('commonName', value.commonName.trim());
@@ -271,8 +271,8 @@ export class AdminPageComponent implements OnDestroy {
     payload.append('foundIn', value.foundIn.trim());
     payload.append('medicinalUses', value.medicinalUses.trim());
 
-    if (selectedFile) {
-      payload.append('imageFile', selectedFile, selectedFile.name);
+    if (selectedFiles.length) {
+      selectedFiles.forEach((file) => payload.append('imageFiles', file, file.name));
     } else if (this.currentImageUrl) {
       payload.append('imageUrl', this.currentImageUrl);
     }
@@ -282,16 +282,16 @@ export class AdminPageComponent implements OnDestroy {
 
   protected onImageSelected(event: Event) {
     const input = event.target as HTMLInputElement | null;
-    const file = input?.files?.[0] ?? null;
+    const files = Array.from(input?.files ?? []);
 
-    this.selectedImageFile.set(file);
+    this.selectedImageFiles.set(files);
     if (this.previewObjectUrl) {
       URL.revokeObjectURL(this.previewObjectUrl);
       this.previewObjectUrl = null;
     }
 
-    if (file) {
-      this.previewObjectUrl = URL.createObjectURL(file);
+    if (files.length) {
+      this.previewObjectUrl = URL.createObjectURL(files[0]);
       this.imagePreviewUrl.set(this.previewObjectUrl);
       return;
     }

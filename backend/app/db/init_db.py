@@ -1,5 +1,7 @@
 import uuid
 
+from sqlalchemy import inspect, text
+
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -13,6 +15,7 @@ from app.models.user import User
 
 def init_db(db: Session) -> None:
     Base.metadata.create_all(bind=engine)
+    ensure_image_urls_column()
 
     roles = {role.name: role for role in db.query(Role).all()}
     if "Admin" not in roles:
@@ -44,3 +47,16 @@ def init_db(db: Session) -> None:
             existing_admin.password_hash = get_password_hash(settings.ADMIN_PASSWORD)
 
     db.commit()
+
+
+def ensure_image_urls_column() -> None:
+    inspector = inspect(engine)
+    if "plants" not in inspector.get_table_names():
+        return
+
+    columns = {column["name"] for column in inspector.get_columns("plants")}
+    if "image_urls" in columns:
+        return
+
+    with engine.begin() as connection:
+        connection.execute(text("ALTER TABLE plants ADD COLUMN image_urls JSON"))

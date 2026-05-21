@@ -7,6 +7,7 @@ export interface Plant {
   category: PlantCategory;
   ayushSystem?: string | null;
   imageUrl: string;
+  imageUrls?: string[];
   modelUrl?: string | null;
   shortDescription: string;
   description: string;

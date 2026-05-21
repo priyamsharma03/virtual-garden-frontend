@@ -17,6 +17,7 @@ class Plant(Base):
     medicinal_uses = Column(JSON, nullable=False, default=list)
     found_in = Column(JSON, nullable=False, default=list)
     image_url = Column(String(500), nullable=False)
+    image_urls = Column(JSON, default=list)
     model_url = Column(String(500))
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
     ayush_id = Column(Integer, ForeignKey("ayush_systems.id"))

@@ -86,7 +86,9 @@
               formControlName="modelUrl"
               placeholder="https://sketchfab.com/models/.../embed"
             />
-            <small class="hint">Paste the Sketchfab embed URL or the full iframe code. The app will extract the model URL.</small>
+            <small class="hint">
+              Paste the Sketchfab embed URL or iframe for the detail page. For in-garden 3D, use a direct .glb/.gltf file URL.
+            </small>
           </label>
         </div>
 
@@ -95,10 +97,13 @@
             <img [src]="imagePreviewUrl()" [alt]="selectedPlantId() ? 'Selected plant preview' : 'New plant preview'" loading="lazy" />
           </div>
           <label>
-            Plant image
-            <input type="file" accept="image/*" (change)="onImageSelected($event)" />
+            Plant images
+            <input type="file" accept="image/*" multiple (change)="onImageSelected($event)" />
           </label>
-          <p class="hint">Upload a plant image file. The backend will store it and return the saved image URL.</p>
+          <p class="hint">Upload one or more plant images. The first image becomes the primary cover.</p>
+          @if (selectedImageFiles().length) {
+            <p class="hint">Selected: {{ selectedImageFiles().length }} image(s)</p>
+          }
         </div>
 
         <label>

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as THREE from 'three';
 import type { Plant } from '../models/plant.model';
 
@@ -52,6 +53,7 @@ interface PlantModelResult {
 })
 export class ThreeGardenService {
   private readonly upVector = new THREE.Vector3(0, 1, 0);
+  private readonly gltfLoader = new GLTFLoader();
 
   initPreview(canvas: HTMLCanvasElement): SceneHandle {
     return this.buildScene(canvas, { fullScreen: false, controls: false, plants: [] });
@@ -704,6 +706,10 @@ export class ThreeGardenService {
     const id = plant.id.toLowerCase();
     const rand = this.seededRandom(this.hashText(`${plant.id}-${plant.commonName}-${seed}`));
 
+    if (this.isModelFileUrl(plant.modelUrl)) {
+      return this.createModelPlant(plant.modelUrl as string);
+    }
+
     if (plant.category === 'Trees') {
       return this.createTreePlant(plant, seed, rand);
     }
@@ -718,6 +724,60 @@ export class ThreeGardenService {
     }
 
     return this.createLeafyMedicinalPlant(id, rand);
+  }
+
+  private isModelFileUrl(value: string | null | undefined): boolean {
+    if (!value) {
+      return false;
+    }
+
+    return /\.(glb|gltf)(\?|#|$)/i.test(value);
+  }
+
+  private createModelPlant(url: string): PlantModelResult {
+    const group = new THREE.Group();
+    const swayNodes: THREE.Object3D[] = [];
+    const selectableMeshes: THREE.Mesh[] = [];
+
+    const placeholder = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.25, 0.45, 1.6, 12),
+      new THREE.MeshStandardMaterial({ color: '#6f8f3a', roughness: 0.88 })
+    );
+    placeholder.position.y = 0.8;
+    placeholder.castShadow = true;
+    group.add(placeholder);
+    selectableMeshes.push(placeholder);
+
+    this.gltfLoader.load(
+      url,
+      (gltf) => {
+        group.remove(placeholder);
+        const model = gltf.scene;
+        model.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            selectableMeshes.push(child);
+          }
+        });
+
+        const box = new THREE.Box3().setFromObject(model);
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z) || 1;
+        const scale = 2.2 / maxDim;
+        model.scale.setScalar(scale);
+        box.setFromObject(model);
+        model.position.y -= box.min.y;
+        group.add(model);
+      },
+      undefined,
+      () => {
+        placeholder.material = new THREE.MeshStandardMaterial({ color: '#9e8f7a', roughness: 0.92 });
+      }
+    );
+
+    return { group, swayNodes, selectableMeshes, labelHeight: 2.6, focusHeight: 1.4 };
   }
 
   private createTreePlant(plant: Plant, seed: number, rand: () => number): PlantModelResult {
