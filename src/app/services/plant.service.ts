@@ -3,8 +3,9 @@ import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import type { AyushSystem, Category, Plant } from '../models/plant.model';
+import { environment } from '../../environments/environment';
 
-export const API_BASE_URL = 'http://localhost:8000/api/v1';
+export const API_BASE_URL = environment.apiBaseUrl;
 
 @Injectable({
   providedIn: 'root'
@@ -57,12 +58,12 @@ export class PlantService {
     return this.http.get<AyushSystem[]>(`${API_BASE_URL}/ayush-systems`).pipe(catchError(() => of([])));
   }
 
-  createPlant(plant: Plant): Observable<Plant> {
-    return this.http.post<Plant>(`${API_BASE_URL}/plants`, plant).pipe(tap(() => this.refreshPlants()));
+  createPlant(payload: FormData): Observable<Plant> {
+    return this.http.post<Plant>(`${API_BASE_URL}/plants`, payload).pipe(tap(() => this.refreshPlants()));
   }
 
-  updatePlant(plantId: string, plant: Plant): Observable<Plant> {
-    return this.http.put<Plant>(`${API_BASE_URL}/plants/${plantId}`, plant).pipe(tap(() => this.refreshPlants()));
+  updatePlant(plantId: string, payload: FormData): Observable<Plant> {
+    return this.http.put<Plant>(`${API_BASE_URL}/plants/${plantId}`, payload).pipe(tap(() => this.refreshPlants()));
   }
 
   deletePlant(plantId: string): Observable<void> {

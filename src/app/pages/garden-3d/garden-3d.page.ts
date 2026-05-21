@@ -18,6 +18,7 @@ import {
 } from '../../services/three-garden.service';
 import { PlantService } from '../../services/plant.service';
 import { fadeInUp } from '../../shared/animations';
+import { applyPlantImageFallback, resolvePlantImageUrl } from '../../shared/image-utils';
 
 @Component({
   selector: 'app-garden-3d-page',
@@ -30,12 +31,15 @@ export class Garden3dPageComponent implements AfterViewInit, OnDestroy {
 
   protected readonly focusedPlant = signal<GardenPlantFocus | null>(null);
   protected readonly isMobileView = signal(false);
+  protected readonly isIntroVisible = signal(false);
   protected readonly interactionTips = [
     'Desktop: click to lock view, then move with W A S D keys',
     'Desktop: double-click any plant to pin its details panel',
     'Mobile/Tablet: drag to orbit and pinch to zoom',
     'Walk close to plants to auto-view contextual medicinal info'
   ];
+
+  protected readonly resolvePlantImageUrl = resolvePlantImageUrl;
 
   private readonly threeGardenService = inject(ThreeGardenService);
   private readonly plantService = inject(PlantService);
@@ -44,10 +48,7 @@ export class Garden3dPageComponent implements AfterViewInit, OnDestroy {
 
   private sceneHandle?: SceneHandle;
 
-  constructor(
-
-    
-  ) {
+  constructor() {
     this.updateMobileView();
 
     effect(() => {
@@ -77,6 +78,10 @@ export class Garden3dPageComponent implements AfterViewInit, OnDestroy {
     this.updateMobileView();
   }
 
+  toggleIntro() {
+    this.isIntroVisible.update((v) => !v);
+  }
+
   onMovePress(direction: GardenMoveDirection, event: Event) {
     event.preventDefault();
     this.sceneHandle?.setMobileMove?.(direction, true);
@@ -93,6 +98,10 @@ export class Garden3dPageComponent implements AfterViewInit, OnDestroy {
     this.sceneHandle?.setMobileMove?.('backward', false);
     this.sceneHandle?.setMobileMove?.('left', false);
     this.sceneHandle?.setMobileMove?.('right', false);
+  }
+
+  protected handleImageError(event: Event) {
+    applyPlantImageFallback(event);
   }
 
   ngOnDestroy() {

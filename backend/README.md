@@ -14,6 +14,7 @@ A clean FastAPI backend aligned with the Angular frontend models.
 3) Configure environment if you want MySQL:
    cp .env.example .env
    By default the API runs with SQLite at ./virtual_garden.db for local development.
+   Add Cloudinary credentials in .env if you want plant images uploaded to Cloudinary instead of disk storage.
 4) Initialize and seed data:
    python scripts/init_db.py
    python scripts/seed_plants.py
@@ -23,6 +24,7 @@ A clean FastAPI backend aligned with the Angular frontend models.
 ## Notes
 - Default API base path: /api/v1
 - CORS is set via CORS_ORIGINS in .env
+- Plant images are uploaded to Cloudinary when the Cloudinary env vars are set.
 - Admin user is created from ADMIN_* env values
 - Admins can manage users, roles, plants, categories, and AYUSH systems.
 - Managers can create, edit, and soft-delete plant records.

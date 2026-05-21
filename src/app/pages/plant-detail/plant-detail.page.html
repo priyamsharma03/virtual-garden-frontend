@@ -4,7 +4,7 @@
 
     <article class="detail-layout glass-panel">
       <div class="media-column">
-        <img [src]="selectedImage()" [alt]="activePlant.commonName" />
+        <img [src]="resolvePlantImageUrl(selectedImage())" [alt]="activePlant.commonName" (error)="handleImageError($event)" />
 
         <div class="gallery-row">
           @for (image of galleryImages(); track image; let i = $index) {
@@ -15,7 +15,12 @@
               (click)="selectImage(i)"
               [attr.aria-label]="'View photo ' + (i + 1)"
             >
-              <img [src]="image" [alt]="activePlant.commonName + ' photo ' + (i + 1)" loading="lazy" />
+              <img
+                [src]="resolvePlantImageUrl(image)"
+                [alt]="activePlant.commonName + ' photo ' + (i + 1)"
+                loading="lazy"
+                (error)="handleImageError($event)"
+              />
             </button>
           }
         </div>
@@ -78,6 +83,37 @@
           <p>{{ activePlant.description }}</p>
         </section>
 
+        @if (modelEmbedUrl(); as embedUrl) {
+          <section class="info-block model-viewer-block">
+            <h2>3D Model</h2>
+            <div class="model-frame-shell">
+              <iframe
+                [src]="embedUrl"
+                title="{{ activePlant.commonName }} 3D model"
+                frameborder="0"
+                allowfullscreen
+                allow="autoplay; fullscreen; xr-spatial-tracking; web-share"
+                loading="lazy"
+              ></iframe>
+            </div>
+            <p class="model-hint">
+              For Sketchfab, paste the embed URL or the full iframe snippet. The app will extract the model automatically.
+            </p>
+            <div class="model-debug" style="margin-top:0.6rem; font-size:0.9rem; color:var(--text-secondary);">
+              <details>
+                <summary style="cursor:pointer">Debug: model URL info</summary>
+                <div style="margin-top:0.45rem">
+                  <div><strong>Saved URL:</strong> <span>{{ rawModelUrl() || '(empty)' }}</span></div>
+                  <div style="margin-top:0.3rem"><strong>Resolved embed:</strong> <span>{{ resolvedEmbedString() || '(none)' }}</span></div>
+                  <div style="margin-top:0.5rem">
+                    <button type="button" (click)="openEmbedInNewTab()" [disabled]="!resolvedEmbedString()">Open embed URL in new tab</button>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </section>
+        }
+
         <div class="action-row">
           <button type="button">Save to Herbal List</button>
           <a routerLink="/garden-3d">View in 3D Garden</a>
@@ -97,7 +133,12 @@
       <div class="suggestion-grid">
         @for (suggestion of suggestionWindow(); track suggestion.id) {
           <article class="suggestion-card">
-            <img [src]="suggestion.imageUrl" [alt]="suggestion.commonName" loading="lazy" />
+            <img
+              [src]="resolvePlantImageUrl(suggestion.imageUrl)"
+              [alt]="suggestion.commonName"
+              loading="lazy"
+              (error)="handleImageError($event)"
+            />
             <div>
               <p class="category">{{ suggestion.category }}</p>
               <h3>{{ suggestion.commonName }}</h3>

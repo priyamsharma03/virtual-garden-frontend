@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, OnDestroy, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 import { PlantService } from '../../services/plant.service';
 import type { Plant } from '../../models/plant.model';
 import { fadeInUp } from '../../shared/animations';
+import { applyPlantImageFallback, resolvePlantImageUrl } from '../../shared/image-utils';
 
 @Component({
   selector: 'app-admin-page',
@@ -16,7 +17,7 @@ import { fadeInUp } from '../../shared/animations';
   styleUrl: './admin.page.scss',
   animations: [fadeInUp]
 })
-export class AdminPageComponent {
+export class AdminPageComponent implements OnDestroy {
   protected readonly authService = inject(AuthService);
   private readonly plantService = inject(PlantService);
   private readonly adminService = inject(AdminService);
@@ -32,7 +33,12 @@ export class AdminPageComponent {
   protected readonly adminBusy = signal(false);
   protected readonly feedback = signal('');
   protected readonly error = signal('');
+  protected readonly resolvePlantImageUrl = resolvePlantImageUrl;
+  protected readonly imagePreviewUrl = signal(resolvePlantImageUrl(''));
+  protected readonly selectedImageFile = signal<File | null>(null);
   private adminDataLoaded = false;
+  private currentImageUrl = '';
+  private previewObjectUrl: string | null = null;
 
   protected readonly loginForm = this.fb.nonNullable.group({
     email: ['admin@example.com', [Validators.required, Validators.email]],
@@ -40,12 +46,10 @@ export class AdminPageComponent {
   });
 
   protected readonly plantForm = this.fb.nonNullable.group({
-    id: ['', [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)]],
     commonName: ['', Validators.required],
     scientificName: ['', Validators.required],
     category: ['', Validators.required],
     ayushSystem: [''],
-    imageUrl: ['', Validators.required],
     modelUrl: [''],
     shortDescription: ['', [Validators.required, Validators.maxLength(255)]],
     description: ['', Validators.required],
@@ -99,38 +103,40 @@ export class AdminPageComponent {
 
   startCreate() {
     this.selectedPlantId.set(null);
+    this.selectedImageFile.set(null);
+    this.currentImageUrl = '';
     this.plantForm.reset({
-      id: '',
       commonName: '',
       scientificName: '',
       category: '',
       ayushSystem: '',
-      imageUrl: '',
       modelUrl: '',
       shortDescription: '',
       description: '',
       foundIn: '',
       medicinalUses: ''
     });
+    this.setPreviewImage(resolvePlantImageUrl(''));
     this.feedback.set('');
     this.error.set('');
   }
 
   startEdit(plant: Plant) {
     this.selectedPlantId.set(plant.id);
+    this.selectedImageFile.set(null);
+    this.currentImageUrl = plant.imageUrl;
     this.plantForm.setValue({
-      id: plant.id,
       commonName: plant.commonName,
       scientificName: plant.scientificName,
       category: plant.category,
       ayushSystem: plant.ayushSystem ?? '',
-      imageUrl: plant.imageUrl,
       modelUrl: plant.modelUrl ?? '',
       shortDescription: plant.shortDescription,
       description: plant.description,
       foundIn: plant.foundIn.join('\n'),
       medicinalUses: plant.medicinalUses.join('\n')
     });
+    this.setPreviewImage(plant.imageUrl);
     this.feedback.set('');
     this.error.set('');
   }
@@ -142,20 +148,30 @@ export class AdminPageComponent {
       return;
     }
 
+    if (!this.selectedImageFile() && !this.currentImageUrl) {
+      this.error.set('Please upload a plant image.');
+      return;
+    }
+
     this.busy.set(true);
     this.error.set('');
-    const plant = this.buildPlantPayload();
+    const payload = this.buildPlantPayload();
     const selectedId = this.selectedPlantId();
     const request = selectedId
-      ? this.plantService.updatePlant(selectedId, plant)
-      : this.plantService.createPlant(plant);
+      ? this.plantService.updatePlant(selectedId, payload)
+      : this.plantService.createPlant(payload);
 
     request.pipe(finalize(() => this.busy.set(false))).subscribe({
       next: (savedPlant) => {
+        window.alert(`${savedPlant.commonName} was saved successfully.`);
+        this.startCreate();
         this.feedback.set(`${savedPlant.commonName} was saved successfully.`);
-        this.startEdit(savedPlant);
       },
-      error: (error: unknown) => this.error.set(this.getErrorMessage(error, 'Plant could not be saved'))
+      error: (error: unknown) => {
+        const message = this.getErrorMessage(error, 'Plant could not be saved');
+        window.alert(message);
+        this.error.set(message);
+      }
     });
   }
 
@@ -231,39 +247,95 @@ export class AdminPageComponent {
     });
   }
 
-  private buildPlantPayload(): Plant {
+  private buildPlantPayload(): FormData {
     const value = this.plantForm.getRawValue();
+    const selectedFile = this.selectedImageFile();
 
-    return {
-      id: value.id.trim(),
-      commonName: value.commonName.trim(),
-      scientificName: value.scientificName.trim(),
-      category: value.category.trim(),
-      ayushSystem: value.ayushSystem.trim() || null,
-      imageUrl: value.imageUrl.trim(),
-      modelUrl: value.modelUrl.trim() || null,
-      shortDescription: value.shortDescription.trim(),
-      description: value.description.trim(),
-      foundIn: this.toList(value.foundIn),
-      medicinalUses: this.toList(value.medicinalUses)
-    };
+    const payload = new FormData();
+    payload.append('commonName', value.commonName.trim());
+    payload.append('scientificName', value.scientificName.trim());
+    payload.append('category', value.category.trim());
+
+    const ayushSystem = value.ayushSystem.trim();
+    if (ayushSystem) {
+      payload.append('ayushSystem', ayushSystem);
+    }
+
+    const modelUrl = value.modelUrl.trim();
+    if (modelUrl) {
+      payload.append('modelUrl', modelUrl);
+    }
+
+    payload.append('shortDescription', value.shortDescription.trim());
+    payload.append('description', value.description.trim());
+    payload.append('foundIn', value.foundIn.trim());
+    payload.append('medicinalUses', value.medicinalUses.trim());
+
+    if (selectedFile) {
+      payload.append('imageFile', selectedFile, selectedFile.name);
+    } else if (this.currentImageUrl) {
+      payload.append('imageUrl', this.currentImageUrl);
+    }
+
+    return payload;
   }
 
-  private toList(value: string): string[] {
-    return value
-      .split(/\r?\n|,/)
-      .map((item) => item.trim())
-      .filter(Boolean);
+  protected onImageSelected(event: Event) {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0] ?? null;
+
+    this.selectedImageFile.set(file);
+    if (this.previewObjectUrl) {
+      URL.revokeObjectURL(this.previewObjectUrl);
+      this.previewObjectUrl = null;
+    }
+
+    if (file) {
+      this.previewObjectUrl = URL.createObjectURL(file);
+      this.imagePreviewUrl.set(this.previewObjectUrl);
+      return;
+    }
+
+    this.imagePreviewUrl.set(this.currentImageUrl ? resolvePlantImageUrl(this.currentImageUrl) : resolvePlantImageUrl(''));
+  }
+
+  private setPreviewImage(url: string) {
+    if (this.previewObjectUrl) {
+      URL.revokeObjectURL(this.previewObjectUrl);
+      this.previewObjectUrl = null;
+    }
+
+    this.imagePreviewUrl.set(resolvePlantImageUrl(url));
+  }
+
+  ngOnDestroy() {
+    if (this.previewObjectUrl) {
+      URL.revokeObjectURL(this.previewObjectUrl);
+      this.previewObjectUrl = null;
+    }
   }
 
   private getErrorMessage(error: unknown, fallback: string): string {
     if (error instanceof HttpErrorResponse) {
       const detail = error.error?.detail;
+      if (
+        error.status === 401 &&
+        (detail === 'User not found' || detail === 'Invalid token' || detail === 'Not authenticated')
+      ) {
+        this.authService.logout();
+        this.adminDataLoaded = false;
+        this.selectedPlantId.set(null);
+        return 'Session expired. Please sign in again.';
+      }
       if (typeof detail === 'string') {
         return detail;
       }
     }
 
     return fallback;
+  }
+
+  protected handleImageError(event: Event) {
+    applyPlantImageFallback(event);
   }
 }

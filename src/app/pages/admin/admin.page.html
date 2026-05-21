@@ -54,10 +54,6 @@
 
         <div class="form-grid">
           <label>
-            Plant ID
-            <input type="text" formControlName="id" placeholder="ashwagandha" />
-          </label>
-          <label>
             Common name
             <input type="text" formControlName="commonName" placeholder="Ashwagandha" />
           </label>
@@ -84,18 +80,31 @@
             </datalist>
           </label>
           <label>
-            Image URL
-            <input type="url" formControlName="imageUrl" placeholder="https://..." />
-          </label>
-          <label>
             3D model URL
-            <input type="url" formControlName="modelUrl" placeholder="Optional" />
-          </label>
-          <label>
-            Short description
-            <textarea rows="3" formControlName="shortDescription"></textarea>
+            <input
+              type="text"
+              formControlName="modelUrl"
+              placeholder="https://sketchfab.com/models/.../embed"
+            />
+            <small class="hint">Paste the Sketchfab embed URL or the full iframe code. The app will extract the model URL.</small>
           </label>
         </div>
+
+        <div class="image-upload-panel">
+          <div class="image-preview">
+            <img [src]="imagePreviewUrl()" [alt]="selectedPlantId() ? 'Selected plant preview' : 'New plant preview'" loading="lazy" />
+          </div>
+          <label>
+            Plant image
+            <input type="file" accept="image/*" (change)="onImageSelected($event)" />
+          </label>
+          <p class="hint">Upload a plant image file. The backend will store it and return the saved image URL.</p>
+        </div>
+
+        <label>
+          Short description
+          <textarea rows="3" formControlName="shortDescription"></textarea>
+        </label>
 
         <label>
           Full description
@@ -129,7 +138,12 @@
         <div class="plant-list">
           @for (plant of plants(); track plant.id) {
             <article [class.selected]="selectedPlantId() === plant.id">
-              <img [src]="plant.imageUrl" [alt]="plant.commonName" loading="lazy" />
+              <img
+                [src]="resolvePlantImageUrl(plant.imageUrl)"
+                [alt]="plant.commonName"
+                loading="lazy"
+                (error)="handleImageError($event)"
+              />
               <div>
                 <strong>{{ plant.commonName }}</strong>
                 <span>{{ plant.scientificName }}</span>

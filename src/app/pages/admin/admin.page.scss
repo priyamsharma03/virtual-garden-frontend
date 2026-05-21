@@ -178,7 +178,7 @@ select:focus {
   gap: 0.8rem;
 }
 
-.form-grid label:nth-child(8) {
+.form-grid label:nth-child(7) {
   grid-column: 1 / -1;
 }
 
@@ -186,6 +186,26 @@ select:focus {
 .split-fields,
 .primary-action {
   margin-top: 0.85rem;
+}
+
+.image-upload-panel {
+  margin-top: 0.85rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.image-preview {
+  border: 1px solid var(--border-color);
+  border-radius: 0.85rem;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
+
+  img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
 }
 
 .split-fields {

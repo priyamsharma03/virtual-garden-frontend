@@ -4,6 +4,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
 import { PlantService } from '../../services/plant.service';
 import { fadeInUp } from '../../shared/animations';
+import { applyPlantImageFallback, resolvePlantImageUrl } from '../../shared/image-utils';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 interface MedicinalUseDetail {
   title: string;
@@ -20,6 +22,7 @@ interface MedicinalUseDetail {
 export class PlantDetailPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly plantService = inject(PlantService);
+  private readonly sanitizer = inject(DomSanitizer);
   private readonly suggestionsStart = signal(0);
   private readonly selectedImageIndex = signal(0);
 
@@ -160,6 +163,20 @@ export class PlantDetailPageComponent {
     );
   });
 
+  protected readonly modelEmbedUrl = computed<SafeResourceUrl | null>(() => {
+    const activePlant = this.plant();
+    const embedUrl = this.resolveSketchfabEmbedUrl(activePlant?.modelUrl ?? '');
+    return embedUrl ? this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl) : null;
+  });
+
+  protected readonly rawModelUrl = computed(() => this.plant()?.modelUrl ?? '');
+
+  protected readonly resolvedEmbedString = computed(() => {
+    return this.resolveSketchfabEmbedUrl(this.rawModelUrl()) ?? '';
+  });
+
+  protected readonly resolvePlantImageUrl = resolvePlantImageUrl;
+
   constructor() {
     effect(() => {
       this.activePlantId();
@@ -172,9 +189,45 @@ export class PlantDetailPageComponent {
     this.selectedImageIndex.set(index);
   }
 
+  protected handleImageError(event: Event) {
+    applyPlantImageFallback(event);
+  }
+
+  private resolveSketchfabEmbedUrl(rawValue: string): string | null {
+    const value = rawValue.trim();
+    if (!value) {
+      return null;
+    }
+
+    const srcMatch = value.match(/src=["']([^"']+)["']/i);
+    const source = srcMatch?.[1] ?? value;
+
+    if (/^https?:\/\//i.test(source)) {
+      if (/\/embed(?:\?|$)/i.test(source)) {
+        return source;
+      }
+
+      const embeddedIdMatch = source.match(/(?:models\/|3d-models\/[^/]+-)([a-f0-9]{32})(?:[/?#]|$)/i);
+      if (embeddedIdMatch?.[1]) {
+        return `https://sketchfab.com/models/${embeddedIdMatch[1]}/embed`;
+      }
+
+      return source;
+    }
+
+    return null;
+  }
+
   previousSuggestions() {
     if (this.canSlidePrevious()) {
       this.suggestionsStart.update((value) => Math.max(0, value - 1));
+    }
+  }
+
+  openEmbedInNewTab() {
+    const url = this.resolvedEmbedString();
+    if (url) {
+      window.open(url, '_blank', 'noopener');
     }
   }
 

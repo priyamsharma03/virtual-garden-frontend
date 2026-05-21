@@ -1,45 +1,58 @@
 <section class="garden-page" @fadeInUp>
   <canvas #gardenCanvas aria-label="Interactive 3D medicinal garden"></canvas>
 
-  <div class="overlay intro glass-panel">
-    <h1>Immersive 3D Medicinal Garden</h1>
-    @if (isMobileView()) {
-      <p class="mobile-copy">Use the controls below to move, and tap plants to learn medicinal details.</p>
-    } @else {
-      <p>
-        Explore a larger botanical space with interactive plants. Move through the garden and inspect details as
-        you approach each species.
-      </p>
-      <ul>
-        @for (tip of interactionTips; track tip) {
-          <li>{{ tip }}</li>
-        }
-      </ul>
-    }
-  </div>
+  <button class="info-toggle-btn glass-panel" type="button" (click)="toggleIntro()" aria-label="Toggle introduction panel">
+    i
+  </button>
 
-  <div class="overlay details glass-panel">
-    @if (focusedPlant(); as plant) {
-      <img [src]="plant.imageUrl" [alt]="plant.commonName" loading="lazy" />
-      <div>
-        <p class="category">{{ plant.category }}</p>
-        <h2>{{ plant.commonName }}</h2>
-        <p class="scientific">{{ plant.scientificName }}</p>
-        <p>{{ plant.description }}</p>
-
-        <h3>Medicinal Uses</h3>
-        <div class="uses-row">
-          @for (use of plant.medicinalUses.slice(0, 3); track use) {
-            <span>{{ use }}</span>
+  @if (isIntroVisible()) {
+    <div class="overlay intro glass-panel">
+      <button class="close-btn" type="button" (click)="toggleIntro()" aria-label="Close introduction panel">&times;</button>
+      <h1>Immersive 3D Medicinal Garden</h1>
+      @if (isMobileView()) {
+        <p class="mobile-copy">Use the controls below to move, and tap plants to learn medicinal details.</p>
+      } @else {
+        <p>
+          Explore a larger botanical space with interactive plants. Move through the garden and inspect details as
+          you approach each species.
+        </p>
+        <ul>
+          @for (tip of interactionTips; track tip) {
+            <li>{{ tip }}</li>
           }
+        </ul>
+      }
+    </div>
+  }
+
+  @if (focusedPlant(); as plant) {
+    <div class="overlay details glass-panel">
+        <img
+          [src]="resolvePlantImageUrl(plant.imageUrl)"
+          [alt]="plant.commonName"
+          loading="lazy"
+          (error)="handleImageError($event)"
+        />
+        <div class="details-content">
+          <p class="category">{{ plant.category }}</p>
+          <h2>{{ plant.commonName }}</h2>
+          <p class="scientific">{{ plant.scientificName }}</p>
+          <p class="description">{{ plant.shortDescription }}</p>
+
+          <div class="uses-row">
+            @for (use of plant.medicinalUses.slice(0, 3); track use) {
+              <span>{{ use }}</span>
+            }
+          </div>
+          <small>Distance: {{ plant.distance.toFixed(1) }}m</small>
         </div>
-        <small>Distance: {{ plant.distance.toFixed(1) }}m</small>
-      </div>
-    } @else {
-      <h2>Plant Focus Panel</h2>
+    </div>
+  } @else if (!isIntroVisible()) {
+    <div class="overlay details glass-panel empty">
+      <h2>Plant Focus</h2>
       <p>Move closer to any plant, or double-click a plant to pin its profile details here.</p>
-    }
-  </div>
+    </div>
+  }
 
   @if (isMobileView()) {
     <div class="mobile-controls glass-panel" (pointerup)="stopAllMoves($event)" (pointercancel)="stopAllMoves($event)">

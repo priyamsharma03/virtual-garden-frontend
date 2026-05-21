@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.core.security import get_password_hash
+from app.core.security import get_password_hash, verify_password
 from app.db.base import Base
 from app.db.session import engine
 from app import models  # noqa: F401
@@ -37,5 +37,10 @@ def init_db(db: Session) -> None:
             role_id=roles["Admin"].id,
         )
         db.add(admin)
+    else:
+        existing_admin.name = settings.ADMIN_NAME
+        existing_admin.role_id = roles["Admin"].id
+        if not verify_password(settings.ADMIN_PASSWORD, existing_admin.password_hash):
+            existing_admin.password_hash = get_password_hash(settings.ADMIN_PASSWORD)
 
     db.commit()

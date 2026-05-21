@@ -5,6 +5,9 @@
   overflow: hidden;
   box-shadow: var(--shadow-soft);
   transition: transform 240ms ease, box-shadow 240ms ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
   &:hover {
     transform: translateY(-6px);
@@ -38,6 +41,10 @@
 
 .content {
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  height: 100%;
 }
 
 h3 {
@@ -77,4 +84,9 @@ h3 {
   margin-top: 0.95rem;
   font-weight: 600;
   color: var(--primary);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  align-self: flex-start;
+  margin-top: auto;
 }

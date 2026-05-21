@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_content_manager
@@ -8,18 +8,35 @@ from app.crud import plant as plant_crud
 from app.models.plant import Plant
 from app.models.user import User
 from app.schemas.plant import PlantCreate, PlantPublic, PlantUpdate
+from app.services.cloudinary import upload_image
 
 router = APIRouter(prefix="/plants", tags=["plants"])
 
 
-def plant_to_public(plant: Plant) -> PlantPublic:
+def build_public_image_url(request: Request, image_url: str) -> str:
+    if image_url.startswith(("http://", "https://")):
+        return image_url
+    if image_url.startswith("/"):
+        return f"{str(request.base_url).rstrip('/')}{image_url}"
+    return f"{str(request.base_url).rstrip('/')}/{image_url}"
+
+
+def parse_text_list(value: str | None) -> list[str]:
+    if not value:
+        return []
+
+    normalized = value.replace("\r", "")
+    return [item.strip() for item in normalized.split("\n") if item.strip()]
+
+
+def plant_to_public(request: Request, plant: Plant) -> PlantPublic:
     return PlantPublic(
         id=plant.slug,
         commonName=plant.common_name,
         scientificName=plant.botanical_name,
         category=plant.category.name if plant.category else "",
         ayushSystem=plant.ayush_system.name if plant.ayush_system else None,
-        imageUrl=plant.image_url,
+        imageUrl=build_public_image_url(request, plant.image_url),
         modelUrl=plant.model_url,
         shortDescription=plant.short_description,
         description=plant.description,
@@ -30,6 +47,7 @@ def plant_to_public(plant: Plant) -> PlantPublic:
 
 @router.get("", response_model=list[PlantPublic], response_model_by_alias=True)
 def list_plants(
+    request: Request,
     search: str | None = None,
     category: str | None = None,
     limit: int = Query(50, ge=1, le=200),
@@ -37,35 +55,74 @@ def list_plants(
     db: Session = Depends(get_db),
 ):
     plants = plant_crud.list_plants(db, search=search, category=category, limit=limit, offset=offset)
-    return [plant_to_public(plant) for plant in plants]
+    return [plant_to_public(request, plant) for plant in plants]
 
 
 @router.get("/{plant_id}", response_model=PlantPublic, response_model_by_alias=True)
-def get_plant(plant_id: str, db: Session = Depends(get_db)):
+def get_plant(plant_id: str, request: Request, db: Session = Depends(get_db)):
     plant = plant_crud.get_by_slug(db, plant_id)
     if not plant:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plant not found")
-    return plant_to_public(plant)
+    return plant_to_public(request, plant)
 
 
 @router.post("", response_model=PlantPublic, response_model_by_alias=True)
 def create_plant(
-    payload: PlantCreate,
+    request: Request,
+    common_name: str = Form(..., alias="commonName"),
+    scientific_name: str = Form(..., alias="scientificName"),
+    category: str = Form(...),
+    ayush_system: str | None = Form(None, alias="ayushSystem"),
+    short_description: str = Form(..., alias="shortDescription"),
+    description: str = Form(...),
+    found_in: str = Form("", alias="foundIn"),
+    medicinal_uses: str = Form("", alias="medicinalUses"),
+    model_url: str | None = Form(None, alias="modelUrl"),
+    image_file: UploadFile | None = File(None, alias="imageFile"),
+    image_url: str | None = Form(None, alias="imageUrl"),
     db: Session = Depends(get_db),
     current_user: User = Depends(require_content_manager),
 ):
-    if plant_crud.get_by_slug(db, payload.slug):
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Plant id already exists")
-    category = category_crud.get_or_create(db, payload.category)
-    ayush_system = ayush_crud.get_or_create(db, payload.ayush_system) if payload.ayush_system else None
-    plant = plant_crud.create_plant(db, payload, category, ayush_system, current_user.id)
-    return plant_to_public(plant)
+    stored_image_url = upload_image(image_file) if image_file and image_file.filename else None
+    resolved_image_url = stored_image_url or (image_url.strip() if image_url else "")
+    if not resolved_image_url:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Plant image is required")
+
+    payload = PlantCreate.model_validate(
+        {
+            "commonName": common_name,
+            "scientificName": scientific_name,
+            "category": category,
+            "ayushSystem": ayush_system.strip() if ayush_system else None,
+            "imageUrl": resolved_image_url,
+            "modelUrl": model_url.strip() if model_url else None,
+            "shortDescription": short_description,
+            "description": description,
+            "foundIn": parse_text_list(found_in),
+            "medicinalUses": parse_text_list(medicinal_uses),
+        }
+    )
+    category_record = category_crud.get_or_create(db, payload.category)
+    ayush_record = ayush_crud.get_or_create(db, payload.ayush_system) if payload.ayush_system else None
+    plant = plant_crud.create_plant(db, payload, category_record, ayush_record, current_user.id)
+    return plant_to_public(request, plant)
 
 
 @router.put("/{plant_id}", response_model=PlantPublic, response_model_by_alias=True)
 def update_plant(
     plant_id: str,
-    payload: PlantUpdate,
+    request: Request,
+    common_name: str | None = Form(None, alias="commonName"),
+    scientific_name: str | None = Form(None, alias="scientificName"),
+    category: str | None = Form(None),
+    ayush_system: str | None = Form(None, alias="ayushSystem"),
+    short_description: str | None = Form(None, alias="shortDescription"),
+    description: str | None = Form(None),
+    found_in: str | None = Form(None, alias="foundIn"),
+    medicinal_uses: str | None = Form(None, alias="medicinalUses"),
+    model_url: str | None = Form(None, alias="modelUrl"),
+    image_file: UploadFile | None = File(None, alias="imageFile"),
+    image_url: str | None = Form(None, alias="imageUrl"),
     db: Session = Depends(get_db),
     current_user: User = Depends(require_content_manager),
 ):
@@ -73,13 +130,39 @@ def update_plant(
     if not plant:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plant not found")
 
-    category = None
-    if payload.category:
-        category = category_crud.get_or_create(db, payload.category)
+    payload_data: dict[str, object] = {}
 
-    ayush_system = ayush_crud.get_or_create(db, payload.ayush_system) if payload.ayush_system else None
-    plant = plant_crud.update_plant(db, plant, payload, category, ayush_system)
-    return plant_to_public(plant)
+    if common_name is not None:
+        payload_data["commonName"] = common_name
+    if scientific_name is not None:
+        payload_data["scientificName"] = scientific_name
+    if category:
+        payload_data["category"] = category
+    if ayush_system is not None:
+        payload_data["ayushSystem"] = ayush_system.strip() or None
+    if short_description is not None:
+        payload_data["shortDescription"] = short_description
+    if description is not None:
+        payload_data["description"] = description
+    if found_in is not None:
+        payload_data["foundIn"] = parse_text_list(found_in)
+    if medicinal_uses is not None:
+        payload_data["medicinalUses"] = parse_text_list(medicinal_uses)
+    if model_url is not None:
+        payload_data["modelUrl"] = model_url.strip() or None
+
+    stored_image_url = upload_image(image_file) if image_file and image_file.filename else None
+    if stored_image_url:
+        payload_data["imageUrl"] = stored_image_url
+    elif image_url is not None and image_url.strip():
+        payload_data["imageUrl"] = image_url.strip()
+
+    payload = PlantUpdate.model_validate(payload_data)
+
+    category_record = category_crud.get_or_create(db, category) if category else None
+    ayush_record = ayush_crud.get_or_create(db, ayush_system.strip()) if ayush_system and ayush_system.strip() else None
+    plant = plant_crud.update_plant(db, plant, payload, category_record, ayush_record)
+    return plant_to_public(request, plant)
 
 
 @router.delete("/{plant_id}", status_code=status.HTTP_204_NO_CONTENT)

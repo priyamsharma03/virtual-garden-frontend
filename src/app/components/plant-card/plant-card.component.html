@@ -1,6 +1,11 @@
 <article class="plant-card">
   <div class="image-wrap">
-    <img [src]="plant.imageUrl" [alt]="plant.commonName" loading="lazy" />
+    <img
+      [src]="resolvePlantImageUrl(plant.imageUrl)"
+      [alt]="plant.commonName"
+      loading="lazy"
+      (error)="handleImageError($event)"
+    />
     <span class="category">{{ plant.category }}</span>
   </div>
 

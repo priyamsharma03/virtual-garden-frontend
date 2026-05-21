@@ -1,3 +1,4 @@
+import re
 import uuid
 from datetime import datetime, timezone
 
@@ -8,6 +9,24 @@ from app.models.ayush_system import AyushSystem
 from app.models.category import Category
 from app.models.plant import Plant
 from app.schemas.plant import PlantCreate, PlantUpdate
+
+
+def _slugify(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    return re.sub(r"-+", "-", slug)
+
+
+def _build_unique_slug(db: Session, *values: str) -> str:
+    base_value = next((value for value in values if value.strip()), "plant")
+    base_slug = _slugify(base_value) or "plant"
+    slug = base_slug
+    suffix = 1
+
+    while db.query(Plant.id).filter(Plant.slug == slug).first():
+        suffix += 1
+        slug = f"{base_slug}-{suffix}"
+
+    return slug
 
 
 def list_plants(
@@ -43,9 +62,10 @@ def create_plant(
     ayush_system: AyushSystem | None = None,
     created_by: str | None = None,
 ) -> Plant:
+    slug = payload.slug.strip() if payload.slug else _build_unique_slug(db, payload.common_name, payload.scientific_name)
     plant = Plant(
         id=str(uuid.uuid4()),
-        slug=payload.slug,
+        slug=slug,
         botanical_name=payload.scientific_name,
         common_name=payload.common_name,
         short_description=payload.short_description,

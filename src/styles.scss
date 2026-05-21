@@ -1,17 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap');
 
 :root {
   --primary: #1b5e20;
   --secondary: #66bb6a;
   --accent: #6d4c41;
-  --bg: #f5f5f5;
+  --bg: #f2f5f0;
+  --bg-gradient: radial-gradient(circle at 15% 10%, #eaf5ea, transparent 45%),
+    radial-gradient(circle at 90% 5%, #edf6f0, transparent 40%),
+    linear-gradient(180deg, #f5f8f3 0%, #eef4ef 100%);
   --surface: #ffffff;
   --text-primary: #143122;
   --text-secondary: #41584a;
   --border-color: #d6e4d6;
 
-  --heading-font: 'Poppins', sans-serif;
-  --body-font: 'Inter', sans-serif;
+  --heading-font: 'Fraunces', serif;
+  --body-font: 'Manrope', sans-serif;
 
   --radius-lg: 1rem;
   --shadow-soft: 0 14px 36px rgb(24 61 31 / 12%);
@@ -20,6 +23,9 @@
 
 :root.dark {
   --bg: #0f1813;
+  --bg-gradient: radial-gradient(circle at 20% 10%, #1f2b22, transparent 55%),
+    radial-gradient(circle at 90% 0%, #1a251f, transparent 40%),
+    linear-gradient(180deg, #0f1813 0%, #0f1a14 100%);
   --surface: #15201b;
   --text-primary: #e5f2e7;
   --text-secondary: #b3c8b7;
@@ -45,6 +51,7 @@ html {
 body {
   font-family: var(--body-font);
   background: var(--bg);
+  background-image: var(--bg-gradient);
   color: var(--text-primary);
   transition: background 220ms ease, color 220ms ease;
 }

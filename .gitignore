@@ -41,6 +41,22 @@ testem.log
 /typings
 __screenshots__/
 
+# Local env + runtime files
+.env
+.env.*
+!.env.example
+/backend/.env
+/backend/virtual_garden.db
+/backend/uploads/
+/uploads/
+
+# Python caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+/htmlcov/
+/.python-version
+
 # System files
 .DS_Store
 Thumbs.db

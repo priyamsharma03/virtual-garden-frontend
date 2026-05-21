@@ -17,7 +17,7 @@ class PlantBase(BaseModel):
 
 
 class PlantCreate(PlantBase):
-    slug: str = Field(..., alias="id")
+    slug: str | None = Field(None, alias="id")
 
 
 class PlantUpdate(BaseModel):
