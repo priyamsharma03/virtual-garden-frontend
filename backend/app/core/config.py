@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     ADMIN_EMAIL: str = "admin@example.com"
     ADMIN_PASSWORD: str = "change_me"
     ADMIN_NAME: str = "Admin User"
-    CORS_ORIGINS: list[str] = ["http://localhost:4200","https://virtual-garden-mp.onrender.com/"]  # Allow both local development and deployed frontend
+    CORS_ORIGINS: list[str] = ["http://localhost:4200","https://virtual-garden-mp.netlify.app"]  # Allow both local development and deployed frontend
     CORS_ORIGIN_REGEX: str = r"https?://(localhost|127\.0\.0\.1)(:\d+)?"
     IMAGE_UPLOAD_DIR: str = "uploads/plants"
     CLOUDINARY_CLOUD_NAME: str | None = None
