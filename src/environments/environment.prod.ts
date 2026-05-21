@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://your-backend.example.com/api/v1'
+  apiBaseUrl: 'https://virtual-garden-mp.onrender.com/api/v1'
 };

@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import type { AyushSystem, Category, Plant } from '../models/plant.model';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.prod';
 
 export const API_BASE_URL = environment.apiBaseUrl;
 
