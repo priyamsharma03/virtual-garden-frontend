@@ -12,6 +12,7 @@ export interface GardenPlantFocus {
   imageUrl: string;
   description: string;
   shortDescription: string;
+  modelUrl: string | null;
   medicinalUses: string[];
   distance: number;
 }
@@ -318,6 +319,7 @@ export class ThreeGardenService {
           imageUrl: activePlant.info.imageUrl,
           description: activePlant.info.description,
           shortDescription: activePlant.info.shortDescription,
+          modelUrl: activePlant.info.modelUrl ?? null,
           medicinalUses: activePlant.info.medicinalUses,
           distance: activeDistance
         });

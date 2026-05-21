@@ -1,3 +1,5 @@
+import re
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, UploadFile, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -28,6 +30,31 @@ def parse_text_list(value: str | None) -> list[str]:
 
     normalized = value.replace("\r", "")
     return [item.strip() for item in normalized.split("\n") if item.strip()]
+
+
+def normalize_model_url(value: str | None) -> str | None:
+    if not value:
+        return None
+
+    cleaned = value.strip()
+    if not cleaned:
+        return None
+
+    src_match = re.search(r"src=[\"']([^\"']+)[\"']", cleaned, re.IGNORECASE)
+    resolved = src_match.group(1) if src_match else cleaned
+
+    if "sketchfab.com" in resolved and "/embed" not in resolved:
+        id_match = re.search(r"(?:models/|3d-models/[^/]+-)([a-f0-9]{32})", resolved, re.IGNORECASE)
+        if id_match:
+            resolved = f"https://sketchfab.com/models/{id_match.group(1)}/embed"
+
+    if len(resolved) > 500:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Model URL is too long. Please paste the Sketchfab embed URL only.",
+        )
+
+    return resolved
 
 
 def plant_to_public(request: Request, plant: Plant) -> PlantPublic:
@@ -96,7 +123,7 @@ def create_plant(
             "category": category,
             "ayushSystem": ayush_system.strip() if ayush_system else None,
             "imageUrl": resolved_image_url,
-            "modelUrl": model_url.strip() if model_url else None,
+            "modelUrl": normalize_model_url(model_url),
             "shortDescription": short_description,
             "description": description,
             "foundIn": parse_text_list(found_in),
@@ -162,7 +189,7 @@ def update_plant(
     if medicinal_uses is not None:
         payload_data["medicinalUses"] = parse_text_list(medicinal_uses)
     if model_url is not None:
-        payload_data["modelUrl"] = model_url.strip() or None
+        payload_data["modelUrl"] = normalize_model_url(model_url)
 
     stored_image_url = upload_image(image_file) if image_file and image_file.filename else None
     if stored_image_url:

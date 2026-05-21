@@ -87,6 +87,13 @@ export class Garden3dPageComponent implements AfterViewInit, OnDestroy {
     this.sceneHandle?.setMobileMove?.(direction, true);
   }
 
+  openModel(rawUrl: string | null) {
+    const resolved = this.resolveSketchfabEmbedUrl(rawUrl ?? '') ?? rawUrl;
+    if (resolved) {
+      window.open(resolved, '_blank', 'noopener');
+    }
+  }
+
   onMoveRelease(direction: GardenMoveDirection, event?: Event) {
     event?.preventDefault();
     this.sceneHandle?.setMobileMove?.(direction, false);
@@ -111,5 +118,25 @@ export class Garden3dPageComponent implements AfterViewInit, OnDestroy {
 
   private updateMobileView() {
     this.isMobileView.set(window.matchMedia('(max-width: 900px)').matches);
+  }
+
+  private resolveSketchfabEmbedUrl(value: string): string | null {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    const srcMatch = trimmed.match(/src=["']([^"']+)["']/i);
+    const url = srcMatch?.[1] ?? trimmed;
+    if (/\/embed(?:\?|$)/i.test(url)) {
+      return url;
+    }
+
+    const idMatch = url.match(/(?:models\/|3d-models\/[^/]+-)([a-f0-9]{32})(?:[/?#]|$)/i);
+    if (idMatch?.[1]) {
+      return `https://sketchfab.com/models/${idMatch[1]}/embed`;
+    }
+
+    return url;
   }
 }

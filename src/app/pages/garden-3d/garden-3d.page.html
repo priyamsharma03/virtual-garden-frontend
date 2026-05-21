@@ -44,6 +44,9 @@
               <span>{{ use }}</span>
             }
           </div>
+          @if (plant.modelUrl) {
+            <button class="model-btn" type="button" (click)="openModel(plant.modelUrl)">View 3D model</button>
+          }
           <small>Distance: {{ plant.distance.toFixed(1) }}m</small>
         </div>
     </div>
