@@ -17,12 +17,16 @@
 
 .image-wrap {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
+  min-height: 190px;
+  background: color-mix(in srgb, var(--surface) 80%, var(--secondary) 8%);
+  overflow: hidden;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     display: block;
   }
 }
@@ -63,12 +67,17 @@ h3 {
   margin: 0.7rem 0;
   color: var(--text-secondary);
   line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .uses {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
+  min-height: 1.8rem;
 }
 
 .use-pill {
