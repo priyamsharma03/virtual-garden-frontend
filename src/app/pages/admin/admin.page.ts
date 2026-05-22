@@ -271,7 +271,9 @@ export class AdminPageComponent implements OnDestroy {
     payload.append('foundIn', value.foundIn.trim());
     payload.append('medicinalUses', value.medicinalUses.trim());
 
-    if (selectedFiles.length) {
+    if (selectedFiles.length === 1) {
+      payload.append('imageFile', selectedFiles[0], selectedFiles[0].name);
+    } else if (selectedFiles.length > 1) {
       selectedFiles.forEach((file) => payload.append('imageFiles', file, file.name));
     } else if (this.currentImageUrl) {
       payload.append('imageUrl', this.currentImageUrl);
